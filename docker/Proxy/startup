@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+#set -ex
+
+until curl -so /dev/null certs:8000 --connect-timeout 2; do
+  echo "Waiting for cert generation ..."
+  sleep 4
+done
+
+echo "Reading environment variables ..."
+if [[ -z "${SITE_HOSTNAME}" ]]; then
+  echo "Set \"SITE_HOSTNAME\" environment variable."
+  exit 1 
+else 
+  SITE_HOSTNAME="$(echo -e "${SITE_HOSTNAME}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  echo "SITE_HOSTNAME=${SITE_HOSTNAME}"
+fi
+
+if [[ -z "${API_HOSTNAME}" ]]; then
+  echo "Set \"API_HOSTNAME\" environment variable."
+  exit 1 
+else
+  API_HOSTNAME="$(echo -e "${API_HOSTNAME}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  echo "API_HOSTNAME=${API_HOSTNAME}"
+fi
+
+#if [[ -z "${SSL_API_KEY}" ]]; then
+#  echo "Set \"SSL_API_KEY\" environment variable."
+#  exit 1 
+#else
+#  SSL_API_KEY="$(echo -e "${SSL_API_KEY}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+#  echo "SSL_API_KEY=***********${SSL_API_KEY: -3}"
+#fi
+
+echo "Validating SSL certificates and keys ..."
+if [ ! -f "/etc/nginx/ssl/${SITE_HOSTNAME}/fullchain.pem" ]; then
+  echo "File /etc/nginx/ssl/${SITE_HOSTNAME}/fullchain.pem not found!"
+  exit 1 
+fi
+
+if [ ! -f "/etc/nginx/ssl/${SITE_HOSTNAME}/privkey.pem" ]; then
+  echo "File /etc/nginx/ssl/${SITE_HOSTNAME}/privkey.pem not found!"
+  exit 1 
+fi
+
+if [ ! -f "/etc/nginx/ssl/${API_HOSTNAME}/fullchain.pem" ]; then
+  echo "File /etc/nginx/ssl/${API_HOSTNAME}/fullchain.pem not found!"
+  exit 1 
+fi
+
+if [ ! -f "/etc/nginx/ssl/${API_HOSTNAME}/privkey.pem" ]; then
+  echo "File /etc/nginx/ssl/${API_HOSTNAME}/privkey.pem not found!"
+  exit 1 
+fi
+
+echo "Updating configurations ..."
+sed -i "s/SITE_HOSTNAME/${SITE_HOSTNAME}/g" /etc/nginx/sites-available/site
+sed -i "s/API_HOSTNAME/${API_HOSTNAME}/g" /etc/nginx/sites-available/api
+#sed -i "s/SSL_API_KEY/${SSL_API_KEY}/g" /nsone.ini 
+
+echo "Running Nginx config test ..."
+nginx -t
+echo "Starting Nginx ..."
+nginx 
+

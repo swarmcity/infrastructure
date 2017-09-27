@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+echo "Reading environment variables ..." >> /var/log/cron.log
+if [[ -z "${SITE_HOSTNAME}" ]]; then
+  echo "Set \"SITE_HOSTNAME\" environment variable."
+  exit 1
+else
+  SITE_HOSTNAME="$(echo -e "${SITE_HOSTNAME}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  echo "SITE_HOSTNAME=${SITE_HOSTNAME}"
+fi
+
+if [[ -z "${API_HOSTNAME}" ]]; then
+  echo "Set \"API_HOSTNAME\" environment variable."
+  exit 1
+else
+  API_HOSTNAME="$(echo -e "${API_HOSTNAME}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  echo "API_HOSTNAME=${API_HOSTNAME}"
+fi
+
+if [[ -z "${SSL_API_KEY}" ]]; then
+  echo "Set \"SSL_API_KEY\" environment variable."
+  exit 1 
+else
+  SSL_API_KEY="$(echo -e "${SSL_API_KEY}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  echo "SSL_API_KEY=***********${SSL_API_KEY: -3}"
+fi
+
+sed -i "s/SSL_API_KEY/${SSL_API_KEY}/g" /nsone.ini
+
+/generate-certs.sh
+
+echo "Starting ... " >> /var/log/cron.log
+python -m SimpleHTTPServer 8000 &
+cron && tail -f /var/log/cron.log
+

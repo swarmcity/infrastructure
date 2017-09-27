@@ -1,0 +1,3 @@
+* * * * *   echo "Cron is running - $(date)" >> /var/log/cron.log 2>&1
+30 0 * * *   /renew-certs >> /var/log/cron.log 2>&1
+

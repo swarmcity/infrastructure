@@ -1,0 +1,26 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/create-wallet.html">
+
+<dom-module id="my-create-wallet">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+      <create-wallet></create-wallet>
+    </div>
+  </template>
+
+  <script>
+    class MyCreateWallet extends Polymer.Element {
+      static get is() { return 'my-create-wallet'; }
+    }
+
+    window.customElements.define(MyCreateWallet.is, MyCreateWallet);
+  </script>
+</dom-module>

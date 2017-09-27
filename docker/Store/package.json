@@ -1,0 +1,25 @@
+{
+  "name": "dragon-store",
+  "version": "1.0.0",
+  "description": "DragonStore",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiyokocrypto/DragonStore.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kiyokocrypto/DragonStore/issues"
+  },
+  "homepage": "https://github.com/kiyokocrypto/DragonStore#readme",
+  "dependencies": {
+    "gun": "^0.8.3",
+    "express": "^4.15.4",
+    "express-fileupload": "^0.1.4",
+    "ipfs-api": "^14.1.2"
+  }
+}

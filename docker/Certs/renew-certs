@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "${DEBUG}" == "Disable" ]; then
+  /certbot-auto renew
+
+  mkdir -p /etc/letsencrypt/nginx-certs
+  cp -Lr /etc/letsencrypt/live/* /etc/letsencrypt/nginx-certs/
+else
+  echo "Skip renew since debug enabled." >> /var/log/cron.log
+fi

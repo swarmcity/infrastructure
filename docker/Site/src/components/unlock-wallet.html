@@ -1,0 +1,114 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-wallet.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="unlock-wallet">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-wallet id="wallet"></function-wallet>
+        <div class="container">
+
+            <h1>Dashboard</h1>
+            <p><b>Before you supply keys</b> confirm the url in the browser is https://website.com</p>
+            <p><b>Double Check!</b> If you supply keys to a malicious/phishing site, your funds will be stolen.</p>
+            
+            <input type="file" name="file" id="file" class="inputfile" on-change="_getFile"/>
+            <label for="file">
+                <paper-button toggles raised>Select Keystore</paper-button>
+            </label>
+        </br></br>
+        <template is="dom-if" if="{{askPassword}}">
+            <paper-input char-counter label="Password" value="{{password}}" on-keyup="_checkPassword"></paper-input>
+        </template>
+        </br>
+            <paper-button toggles raised disabled="{{disabled}}" on-click="_decrypt">Unlock and Enter</paper-button>
+
+        </div>
+    </template>
+    <script>
+        class UnlockWallet extends Polymer.Element {
+            static get is() {
+                return 'unlock-wallet';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * is the unlock button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * show the password
+                    * @type {Boolean}
+                    */
+                    askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                const file = event.target.files[0];
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = () => {
+                    this.keystore = JSON.parse(reader.result);
+                    this.askPassword = true;
+                };
+                reader.onerror = (error) => {
+                    this.loading = false;
+                    this.error = error;
+                };
+        }
+
+        _checkPassword(){
+            if(this.password.length >= 10){
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        }
+        _decrypt(keystore){
+            this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
+            .then((data) => {
+                console.log(data);
+            })
+        }
+        
+
+
+        } window.customElements.define(UnlockWallet.is, UnlockWallet);
+    </script>
+</dom-module>
+
