@@ -1,0 +1,7 @@
+node_modules
+.DS_Store
+platform.env
+data/
+DragonSite/bower_components/
+DragonSite/build/
+npm-debug.log

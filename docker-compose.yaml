@@ -1,0 +1,75 @@
+version: "3.3"
+services:
+  certs:
+    build:
+      context: Certs
+    image: "${CERTS_IMAGE}"
+    env_file:
+      - platform.env
+    volumes:
+      - ~/.dragon/ssl:/etc/letsencrypt
+
+  site:
+    build:
+      context: Site
+    image: "${SITE_IMAGE}"
+    env_file:
+      - platform.env
+    depends_on:
+      - certs
+
+  store:
+    build:
+      context: Store
+    image: "${STORE_IMAGE}"
+    env_file:
+      - platform.env
+    depends_on:
+      - certs
+
+  chain:
+    build:
+      context: Chain
+    image: "${CHAIN_IMAGE}"
+    ports:
+      - "8080:8080"
+      - "8545:8545"
+      - "8645:8645"
+      - "8180:8180"
+    env_file:
+      - platform.env
+
+  api:
+    build:
+      context: API
+    image: "${API_IMAGE}"
+    env_file:
+      - platform.env
+    depends_on:
+      - certs
+      - store
+      - chain
+    links:
+      - store
+      - chain
+
+  proxy:
+    build:
+      context: Proxy
+    image: "${PROXY_IMAGE}"
+    env_file:
+      - platform.env
+    volumes:
+      - ~/.dragon/ssl/nginx-certs:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - certs
+      - site
+      - api
+    links:
+      - certs
+      - site
+      - api
+ 
