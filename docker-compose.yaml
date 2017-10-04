@@ -38,6 +38,8 @@ services:
       - "8180:8180"
     env_file:
       - platform.env
+    volumes:
+      - ~/.dragon/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/
 
   api:
     build:
@@ -72,4 +74,19 @@ services:
       - certs
       - site
       - api
- 
+
+  health:
+    build:
+      context: Health
+    image: "${HEALTH_IMAGE}"
+    env_file:
+      - platform.env
+    depends_on:
+      - chain
+      - site
+      - api
+    links:
+      - chain
+      - site
+      - api
+
