@@ -19,3 +19,7 @@ io.on('connection', function (socket) {
     });
 });
 
+io.on('connect', (socket) => {
+    require('./handlers/connected')(socket);
+    require('./handlers/subscribe')(socket);
+});
