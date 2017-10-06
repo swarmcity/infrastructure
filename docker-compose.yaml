@@ -31,15 +31,17 @@ services:
     build:
       context: Chain
     image: "${CHAIN_IMAGE}"
+    command:
+      --ws-interface all --ws-origins all --ws-hosts all --jsonrpc-hosts all --ui-interface 0.0.0.0 --ui-hosts all --ui-no-validation
     ports:
       - "8080:8080"
-      - "8545:8545"
-      - "8645:8645"
       - "8180:8180"
+      - "8545:8545"
+      - "8546:8546"
     env_file:
       - platform.env
     volumes:
-      - ~/.dragon/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/
+      - /tmp/parity/:/root/.local/share/io.parity.ethereum/
 
   api:
     build:
