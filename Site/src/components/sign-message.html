@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="functions/function-wallet.html">
 <link rel="import" href="functions/function-transaction.html">
@@ -36,7 +37,12 @@
             <paper-input char-counter label="Password" value="{{password}}" on-keyup="_checkPassword"></paper-input>
         </template>
         </br>
-            <paper-button toggles raised disabled="{{disabled}}" on-click="_signMessage">Sign Your Message</paper-button>
+        <paper-button toggles raised disabled="{{disabled}}" on-click="_signMessage">Sign Your Message</paper-button>
+        </br></br>
+        <template is="dom-if" if="{{signedMessage}}">
+            <paper-textarea label="Signed Message" value="{{signature}}"></paper-textarea>
+            <p>This is your signed message you can send or broadcast publicly</p>    
+        </template>
 
         </div>
     </template>
@@ -67,6 +73,14 @@
                     * @type {Boolean}
                     */
                     askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
                         type: Boolean,
                         value: false,
                     },
@@ -104,14 +118,15 @@
             this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
             .then((data) => {
                 const privateKey = data;
-                const message = 'test data';
-                const address = '0x00b4c17D49A1660d95168385d57d5b8D39E3d207';
+                const message = this.message;
+                const address = JSON.parse(localStorage.getItem("utcKeystore")).address;
                 const date = this._makeDate();
-                console.log(date);
                 return this.$.transaction.signMessage(privateKey, message, address, date)
             })
             .then((data) => {
-                console.log(data)
+                const signature = data
+                this.signature = signature;
+                this.signedMessage = true;
             })
         }
         _makeDate(){
