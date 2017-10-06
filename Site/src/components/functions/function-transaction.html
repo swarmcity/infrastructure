@@ -9,7 +9,11 @@
             }
             /**
             * create a signed message
-            * @return {signedMsg} signedMsg
+            * @param {string} privateKey - The private key to sign the message with
+            * @param {string} message - The message to be signed
+            * @param {string} address - The address associated with the private key
+            * @param {string} date - The date to append to the message
+            * @returns {object} 
             */
             signMessage(privateKey, message, address, date) {
                 return new Promise((resolve, reject) => {
@@ -23,7 +27,6 @@
                             Buffer.from([signed.v])
                         ]);
                         const signature = combined.toString('hex');
-
                         const signedMsg = JSON.stringify({
                             address: address,
                             message:  message + ' ' + date,
@@ -37,14 +40,23 @@
             }
 
             /**
-            * create a signed message
-            * @return {signedMsg} signedMsg
+            * verify a signed message
+            * @returns {string} address - The address that signed the message
+            * @param {string} signature - The final signature starting with 0x
+            * @param {string} message - The message before it was signed
             */
-            createKey(privateKey, rawTx) {
+            verifyMessage(signature, message) {
                 return new Promise((resolve, reject) => {
-                    let eTx = new EthTx(rawTx);
-                    eTx.sign(privKey);
-                    return '0x' + eTx.serialize().toString('hex');
+                    if(signature && message){
+                        const {v, r, s} = dragon.fromRpcSig(signature);
+                        const message = dragon.toBuffer(dragon.sha3(message));
+                        const publicKey  = dragon.ecrecover(message, v, r, s);
+                        const addressBuffer = dragon.publicToAddress(publicKey);
+                        const address = dragon.bufferToHex(addressBuffer);
+                        resolve(address);
+                    } else {
+                        reject(Error('Missing Arguments'))
+                    }
                 });
             }
 
