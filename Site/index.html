@@ -60,11 +60,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-tap-highlight" content="no">
     <script src='socket.io.js'></script>
     <script>
-  var socket = io.connect('https://sws.drageth.com');
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
+      var socket = io.connect('http://localhost:8011');
+      socket.on('connected', function (data) {
+        console.log(socket.id);
+      });
+
+      socket.emit('subscribe', {
+        channel: 'balance',
+        args: {
+          pubkey: '0x7018d8f698bfa076e1bdc916e2c64caddc750944',
+          tokens: ['0xb9e7f8568e08d5659f5d29c4997173d84cdf2607', '0x0']
+        }
+      }, (data) => {
+        console.log(data.success);
+        console.log(data.subscription);
+      });
+
+
     </script>  
     <script>
       /**
