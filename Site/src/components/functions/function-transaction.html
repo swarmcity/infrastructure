@@ -11,22 +11,23 @@
             * create a signed message
             * @return {signedMsg} signedMsg
             */
-            createKey(privateKey, message, address, date) {
+            signMessage(privateKey, message, address, date) {
                 return new Promise((resolve, reject) => {
                     if(privateKey && message && address && date){
-                        let hash = sha3(message + ' ' + date);
-                        let signed = ecsign(hash, privateKey);
-                        let combined = Buffer.concat([
+                        const Buffer = dragon.Buffer.Buffer;
+                        const hash = dragon.sha3(message + ' ' + date);
+                        const signed = dragon.ecsign(hash, privateKey);
+                        const combined = Buffer.concat([
                             Buffer.from(signed.r),
                             Buffer.from(signed.s),
                             Buffer.from([signed.v])
                         ]);
-                        let combinedHex = combined.toString('hex');
+                        const signature = combined.toString('hex');
 
                         const signedMsg = JSON.stringify({
                             address: address,
-                            message:  fullMessage,
-                            sig: '0x' + combinedHex
+                            message:  message + ' ' + date,
+                            signature: '0x' + signature
                         });
                         resolve(signedMsg);
                     } else {
@@ -34,6 +35,19 @@
                     }
                 });
             }
+
+            /**
+            * create a signed message
+            * @return {signedMsg} signedMsg
+            */
+            createKey(privateKey, rawTx) {
+                return new Promise((resolve, reject) => {
+                    let eTx = new EthTx(rawTx);
+                    eTx.sign(privKey);
+                    return '0x' + eTx.serialize().toString('hex');
+                });
+            }
+
 
         } window.customElements.define(FunctionTransaction.is, FunctionTransaction);
     </script>
