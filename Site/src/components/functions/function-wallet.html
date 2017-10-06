@@ -120,7 +120,7 @@
                         reject(Error('Wrong Password'));
                     }
                     const decipher = dragon.createDecipheriv(utcKeystore.Crypto.cipher, key.slice(0, 16), new Buffer(utcKeystore.Crypto.cipherparams.iv, 'hex'));
-                    resolve(Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex'));
+                    resolve(Buffer.concat([decipher.update(ciphertext), decipher.final()]));
                 });
             }
 

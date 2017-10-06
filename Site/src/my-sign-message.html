@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/sign-message.html">
+
+<dom-module id="my-sign-message">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <sign-message></sign-message>
+    </div>
+  </template>
+
+  <script>
+    class MysignMessage extends Polymer.Element {
+      static get is() { return 'my-sign-message'; }
+
+    } window.customElements.define(MysignMessage.is, MysignMessage);
+  </script>
+</dom-module>
