@@ -1,0 +1,137 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-wallet.html">
+<link rel="import" href="functions/function-transaction.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="sign-message">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-wallet id="wallet"></function-wallet>
+        <function-transaction id="transaction"></function-transaction>
+        <div class="container">
+            <h1>Sign Message</h1>
+            <p>Include your nickname and where you use the nickname so someone else cannot use it. Include a specific reason for the message so it cannot be reused for a different purpose.</p>
+            <paper-input char-counter label="Message" value="{{message}}"></paper-input>
+            <input type="file" name="file" id="file" class="inputfile" on-change="_getFile"/>
+            </br>
+            <label for="file">
+                <paper-button toggles raised>Select Keystore</paper-button>
+            </label>
+        </br></br>
+        <template is="dom-if" if="{{askPassword}}">
+            <paper-input char-counter label="Password" value="{{password}}" on-keyup="_checkPassword"></paper-input>
+        </template>
+        </br>
+            <paper-button toggles raised disabled="{{disabled}}" on-click="_signMessage">Sign Your Message</paper-button>
+
+        </div>
+    </template>
+    <script>
+        class SignMessage extends Polymer.Element {
+            static get is() {
+                return 'sign-message';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * is the unlock button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * show the password
+                    * @type {Boolean}
+                    */
+                    askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                const file = event.target.files[0];
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = () => {
+                    this.keystore = JSON.parse(reader.result);
+                    this.askPassword = true;
+                };
+                reader.onerror = (error) => {
+                    this.loading = false;
+                    this.error = error;
+                };
+        }
+
+        _checkPassword(){
+            if(this.password.length >= 10){
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        }
+        _signMessage(keystore){
+            this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
+            .then((data) => {
+                const privateKey = data;
+                const message = 'test data';
+                const address = '0x00b4c17D49A1660d95168385d57d5b8D39E3d207';
+                const date = this._makeDate();
+                console.log(date);
+                return this.$.transaction.signMessage(privateKey, message, address, date)
+            })
+            .then((data) => {
+                console.log(data)
+            })
+        }
+        _makeDate(){
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; 
+            var yyyy = today.getFullYear();
+            if(dd<10) {
+                dd = '0'+dd
+            } 
+            if(mm<10) {
+                mm = '0'+mm
+            } 
+            today = mm + '/' + dd + '/' + yyyy;
+            return today;
+        }
+        
+
+
+        } window.customElements.define(SignMessage.is, SignMessage);
+    </script>
+</dom-module>
+
