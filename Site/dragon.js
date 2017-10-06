@@ -1,5 +1,5 @@
 
-import { sha3, privateToAddress,  privateToPublic, publicToAddress, toChecksumAddress } from 'ethereumjs-util';
+import { sha3, privateToAddress,  privateToPublic, publicToAddress, toChecksumAddress, ecsign } from 'ethereumjs-util';
 import { createHash, randomBytes, createCipheriv, pbkdf2Sync, createDecipheriv } from 'crypto';
 import scrypt from 'scryptsy';
 import uuid from 'uuid';
