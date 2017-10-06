@@ -13,6 +13,7 @@ export {
   privateToPublic,
   publicToAddress,
   toChecksumAddress,
+  ecsign,
   createHash, 
   randomBytes, 
   createCipheriv, 
