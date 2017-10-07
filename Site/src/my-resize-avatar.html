@@ -1,0 +1,23 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/resize-avatar.html">
+
+<dom-module id="my-resize-avatar">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+        <div class="card">
+            <resize-avatar></resize-avatar>
+        </div>
+    </template>
+
+    <script>
+    class MyResizeAvatar extends Polymer.Element {
+        static get is() { return 'my-resize-avatar'; }
+    } window.customElements.define(MyResizeAvatar.is, MyResizeAvatar);
+    </script>
+</dom-module>

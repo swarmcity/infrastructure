@@ -8,6 +8,7 @@
     "src/my-sign-message.html",
     "src/my-verify-message.html",
     "src/my-dashboard.html",
+    "src/my-resize-avatar.html",
     "src/my-create-wallet.html",
     "src/my-restore-wallet.html",
     "src/my-view404.html"

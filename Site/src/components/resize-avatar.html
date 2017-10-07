@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="functions/function-message.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="resize-avatar">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .canvas {
+                border: 1px solid black
+            }
+            .file {
+                display: none;
+            }
+            .pointer {
+                cursor: pointer;
+            }
+        </style>
+        <function-message id="message"></function-message>
+        <div class="container">
+            <h1>Resize Avatar</h1>
+            <canvas id="canvas" class="canvas"></canvas>
+            <input type="file" name="file" id="file" class="file" on-change="_getFile"/>
+            </br>
+            <label for="file">
+                <p class="pointer">Select</p>
+            </label>
+            <p on-click="_rotate" class="pointer">Rotate</p>
+            <p on-click="_save" class="pointer">Save</p>
+            <p on-click="_reset" class="pointer">Reset</p>
+        </div>
+    </template>
+    <script>
+        class ResizeAvatar extends Polymer.Element {
+            static get is() {
+                return 'resize-avatar';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+            ready() {
+                super.ready();
+                this._drawCanvas();
+            }
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _drawCanvas(image){
+                const canvas = this.$.canvas;
+                canvas.width = 250;
+                canvas.height = 250;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = "#333333";
+                ctx.fillRect(0,0,250,250);
+                const img = new Image();
+                img.addEventListener('load', function () {
+                    ctx.drawImage(this, 75, 75, 100, 100);
+                });
+                if(image){
+                    img.src = URL.createObjectURL(image);
+                } else {
+                    img.src = 'https://www.polymer-project.org/images/logos/p-logo.png';
+                }
+            }
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                const image = event.target.files[0];
+                this.$.file.value = "";
+                this._drawCanvas(image);
+            }
+            _reset(){
+                this._drawCanvas();
+            }
+            _save(){
+                const canvas = this.$.canvas;
+                var jpegUrl = canvas.toDataURL("image/jpeg");
+                console.log(jpegUrl);
+            }
+            _rotate(){
+                console.log('rotate');
+            }
+
+        } window.customElements.define(ResizeAvatar.is, ResizeAvatar);
+    </script>
+</dom-module>
+
