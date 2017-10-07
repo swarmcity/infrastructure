@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-message.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="verify-message">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-message id="message"></function-message>
+        <div class="container">
+            <h1>Verify Message</h1>
+            <p>Paste below the signed message, at minimum it must have an address and a signature</p>
+            <paper-textarea label="Signed Message" value="{{signedMessage}}"></paper-textarea>
+        </br>
+        <paper-button toggles raised on-click="_verifyMessage">Verify Message</paper-button>
+        </br></br>
+        <template is="dom-if" if="{{messageVerified}}">
+            <p>This message has been succesfully verified!</p>    
+        </template>
+
+        </div>
+    </template>
+    <script>
+        class VerifyMessage extends Polymer.Element {
+            static get is() {
+                return 'verify-message';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * is the unlock button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * show the password
+                    * @type {Boolean}
+                    */
+                    askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+        _verifyMessage(){
+            const signedMessage = JSON.parse(this.signedMessage);
+            const signature = signedMessage.signature;
+            const message = signedMessage.message;
+            this.$.message.verifyMessage(signature, message)
+            .then((data) => {
+                if(data.toLowerCase() === signedMessage.address.toLowerCase()){
+                    this.messageVerified = true;
+                }
+            })
+        }
+
+        } window.customElements.define(VerifyMessage.is, VerifyMessage);
+    </script>
+</dom-module>
+
