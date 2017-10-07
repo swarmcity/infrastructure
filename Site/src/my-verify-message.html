@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/verify-message.html">
+
+<dom-module id="my-verify-message">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <verify-message></verify-message>
+    </div>
+  </template>
+
+  <script>
+    class MyVerifyMessage extends Polymer.Element {
+      static get is() { return 'my-verify-message'; }
+
+    } window.customElements.define(MyVerifyMessage.is, MyVerifyMessage);
+  </script>
+</dom-module>

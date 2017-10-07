@@ -27,6 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="my-view3.html">
 <link rel="lazy-import" href="my-create-wallet.html">
 <link rel="lazy-import" href="my-sign-message.html">
+<link rel="lazy-import" href="my-verify-message.html">
 <link rel="lazy-import" href="my-dashboard.html">
 <link rel="lazy-import" href="my-view404.html">
 
@@ -85,6 +86,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="create-wallet" href="[[rootPath]]create-wallet">Create Wallet</a>
           <a name="sign-message" href="[[rootPath]]sign-message">Sign Message</a>
+          <a name="verify-message" href="[[rootPath]]verify-message">Verify Message</a>
           <a name="dashboard" href="[[rootPath]]dashboard">Dashboard</a>
         </iron-selector>
       </app-drawer>
@@ -109,6 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <my-view3 name="view3"></my-view3>
           <my-create-wallet name="create-wallet"></my-create-wallet>
           <my-sign-message name="sign-message"></my-sign-message>
+          <my-verify-message name="verify-message"></my-verify-message>
           <my-dashboard name="dashboard"></my-dashboard>
           <my-view404 name="view404"></my-view404>
         </iron-pages>

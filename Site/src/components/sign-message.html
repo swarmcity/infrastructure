@@ -3,7 +3,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="functions/function-wallet.html">
-<link rel="import" href="functions/function-transaction.html">
+<link rel="import" href="functions/function-message.html">
 <link rel="import" href="../shared-styles.html">
 
 <dom-module id="sign-message">
@@ -22,7 +22,7 @@
             }
         </style>
         <function-wallet id="wallet"></function-wallet>
-        <function-transaction id="transaction"></function-transaction>
+        <function-message id="message"></function-message>
         <div class="container">
             <h1>Sign Message</h1>
             <p>Include your nickname and where you use the nickname so someone else cannot use it. Include a specific reason for the message so it cannot be reused for a different purpose.</p>
@@ -119,9 +119,9 @@
             .then((data) => {
                 const privateKey = data;
                 const message = this.message;
-                const address = JSON.parse(localStorage.getItem("utcKeystore")).address;
+                const address = this.keystore.address;
                 const date = this._makeDate();
-                return this.$.transaction.signMessage(privateKey, message, address, date)
+                return this.$.message.signMessage(privateKey, message, address, date)
             })
             .then((data) => {
                 const signature = data

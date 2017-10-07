@@ -1,11 +1,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <script src="dragon.min.js" async></script>
 
-<dom-module id="function-transaction">
+<dom-module id="function-message">
     <script>
-        class FunctionTransaction extends Polymer.Element {
+        class FunctionMessage extends Polymer.Element {
             static get is() {
-                return 'function-transaction';
+                return 'function-message';
             }
             /**
             * create a signed message
@@ -28,7 +28,7 @@
                         ]);
                         const signature = combined.toString('hex');
                         const signedMsg = JSON.stringify({
-                            address: address,
+                            address: address.toLowerCase(),
                             message:  message + ' ' + date,
                             signature: '0x' + signature
                         });
@@ -45,15 +45,15 @@
             * @param {string} signature - The final signature starting with 0x
             * @param {string} message - The message before it was signed
             */
-            verifyMessage(signature, message) {
+            verifyMessage(signature, suppliedMessage) {
                 return new Promise((resolve, reject) => {
-                    if(signature && message){
+                    if(signature && suppliedMessage){
                         const {v, r, s} = dragon.fromRpcSig(signature);
-                        const message = dragon.toBuffer(dragon.sha3(message));
+                        const message = dragon.toBuffer(dragon.sha3(suppliedMessage));
                         const publicKey  = dragon.ecrecover(message, v, r, s);
                         const addressBuffer = dragon.publicToAddress(publicKey);
                         const address = dragon.bufferToHex(addressBuffer);
-                        resolve(address);
+                        resolve(address.toLowerCase());
                     } else {
                         reject(Error('Missing Arguments'))
                     }
@@ -61,6 +61,6 @@
             }
 
 
-        } window.customElements.define(FunctionTransaction.is, FunctionTransaction);
+        } window.customElements.define(FunctionMessage.is, FunctionMessage);
     </script>
 </dom-module>
