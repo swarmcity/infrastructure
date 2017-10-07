@@ -32,7 +32,7 @@
             restoreKey(suppliedPrivateKey, password) {
                 return new Promise((resolve, reject) => {
                     const Buffer = dragon.Buffer.Buffer;
-                    var privateKey = new Buffer(suppliedPrivateKey, 'hex');
+                    const privateKey = new Buffer(suppliedPrivateKey, 'hex');
                     const publicKey = dragon.privateToPublic(privateKey);
                     const address = dragon.publicToAddress(publicKey);
                     const hexPrivateKey = privateKey.toString('hex');
