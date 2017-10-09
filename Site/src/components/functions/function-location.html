@@ -21,6 +21,7 @@
                         };
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
+                                console.log(position);
                                 resolve({
                                     latitude: position.coords.latitude,
                                     longitude: position.coords.longitude,
@@ -79,8 +80,71 @@
                     resolve(goeHash);
                 });
             }
+            
+            /**
+             * Converts a geohash to longitude and latitude
+             * @param {string} geoHash
+             * @return {object} object contains te properties latitude and longitude
+             */
+            _toLatLon(geoHash) {
+                return new Promise((resolve, reject) => {
+                    const ratio = [16, 8, 4, 2, 1];
+                    const thirtyTwoBits = '0123456789bcdefghjkmnpqrstuvwxyz';
+                    const geoFence = [];
 
+                    for (var i = 0; i < 2; i++) {
+                        geoFence[i] = [-100, 100];
+                    }
+                    let iteration = 0;
 
+                    for (let i = 0; i < geoHash.length; i++) {
+                        for (let x = 0; x < ratio.length; x++) {
+                            var distance = geoFence[iteration++ % geoFence.length];
+                            var side = thirtyTwoBits
+                                .indexOf(geoHash[i]) & ratio[x] ? 0 : 1;
+                            distance[side] = (distance[0] + distance[1]) / 2;
+                        }
+                    }
+
+                    const mean = [];
+                    for (let i = 0; i < geoFence.length; i++) {
+                        mean[i] = (geoFence[i][0] + geoFence[i][1]) / 2;
+                    }
+                    resolve({
+                        latitude: mean[1] / 100 * 90,
+                        longitude: mean[0] / 100 * 180,
+                    });
+                });
+            }
+                        /**
+             * Find distance between two lat and lon's
+             * @param {string} latA
+             * @param {string} lonA
+             * @param {string} latB
+             * @param {string} lonB
+             * @return {number} distance in meters
+             */
+            _distance(latA, lonA, latB, lonB) {
+                return new Promise((resolve, reject) => {
+                    let phi1 = this._radians(latA);
+                    let phi2 = this._radians(latB);
+                    let deltaPhi = this._radians(latB - latA);
+                    let deltaLambda = this._radians(lonB - lonA);
+                    let amp = Math.sin(deltaPhi / 2.0) * Math.sin(deltaPhi / 2.0) +
+                        Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) *
+                        Math.sin(deltaLambda / 2);
+                    let circ = 2 * Math.atan2(Math.sqrt(amp), Math.sqrt(1 - amp));
+                    resolve(Math.round(circ * 6371000));
+                });
+            }
+            /**
+             * Converts from degrees to radians.
+             * @param {degrees} degrees
+             * @return {degrees} degrees
+             */
+            _radians(degrees) {
+                return (degrees * Math.PI / 180);
+            }
 
         } window.customElements.define(FunctionLocation.is, FunctionLocation);
     </script>

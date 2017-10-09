@@ -9,6 +9,7 @@
     "src/my-create-wallet.html",
     "src/my-restore-wallet.html",
     "src/my-get-geohash.html",
+    "src/my-geohash-distance.html",
     "src/my-view404.html"
   ],
   "sources": [

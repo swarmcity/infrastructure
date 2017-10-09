@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-location.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="geohash-distance">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-location id="location"></function-location>
+        <div class="container">
+
+            <h1>Geohash Distance</h1>
+            <p><b>Enter the two geohashes to calculate the distance between them</p>
+                <paper-input char-counter label="Geohash One" value="{{geohashOne}}"></paper-input>
+                <paper-input char-counter label="Geohash Two" value="{{geohashTwo}}"></paper-input>     
+                <paper-button toggles raised on-click="_geohashDistance">Calculate Distance</paper-button>
+                <template is="dom-if" if="{{distance}}">
+                    <p>Distance: {{distance}} meters</p>
+                </template>
+        </div>
+    </template>
+    <script>
+        class GeohashDistance extends Polymer.Element {
+            static get is() {
+                return 'geohash-distance';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    geohashOne: {
+                        type: String,
+                    },
+                    geohashTwo: {
+                        type: String,
+                    },
+                    distance: {
+                        type: Number,
+                    }
+                };
+            }
+
+            /**
+            * Fired when the user clicks the button
+            * @param {event} event The event from the on-change
+            */
+            _geohashDistance() {
+                Promise.all([
+                    this.$.location._toLatLon(this.geohashOne),
+                    this.$.location._toLatLon(this.geohashTwo),
+                ])
+                .then((details) => {
+                    const latA = details[0].latitude;
+                    const lonA = details[0].longitude;
+                    const latB = details[1].latitude;
+                    const lonB = details[1].longitude;
+                    return this.$.location._distance(latA, lonA, latB, lonB);
+                })
+                .then((distance) => {
+                    this.distance = distance;
+                });
+            }
+
+
+        } window.customElements.define(GeohashDistance.is, GeohashDistance);
+    </script>
+</dom-module>
+
