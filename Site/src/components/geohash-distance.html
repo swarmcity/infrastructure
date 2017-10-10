@@ -24,8 +24,8 @@
 
             <h1>Geohash Distance</h1>
             <p><b>Enter the two geohashes to calculate the distance between them</p>
-                <paper-input char-counter label="Geohash One" value="{{geohashOne}}"></paper-input>
-                <paper-input char-counter label="Geohash Two" value="{{geohashTwo}}"></paper-input>     
+                <paper-input char-counter label="Geohash A" value="{{geohashA}}"></paper-input>
+                <paper-input char-counter label="Geohash B" value="{{geohashB}}"></paper-input>     
                 <paper-button toggles raised on-click="_geohashDistance">Calculate Distance</paper-button>
                 <template is="dom-if" if="{{distance}}">
                     <p>Distance: {{distance}} meters</p>
@@ -61,8 +61,8 @@
             */
             _geohashDistance() {
                 Promise.all([
-                    this.$.location._toLatLon(this.geohashOne),
-                    this.$.location._toLatLon(this.geohashTwo),
+                    this.$.location._toLatLon(this.geohashA),
+                    this.$.location._toLatLon(this.geohashB),
                 ])
                 .then((details) => {
                     const latA = details[0].latitude;
