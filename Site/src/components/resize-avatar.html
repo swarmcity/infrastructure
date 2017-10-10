@@ -61,7 +61,7 @@
             * Fired when the user selects a file
             * @param {event} event The event from the on-change
             */
-            _drawCanvas(image, zoom = 0){
+            _drawCanvas(image, zoom){
                 const canvas = this.$.canvas;
                 canvas.width = 250;
                 canvas.height = 250;
@@ -73,16 +73,16 @@
                 img.crossOrigin = "anonymous";
 				img.zoom = zoom;
                 img.addEventListener('load', function (zoom) {
-                	if(this.zoom != 0) {
+                	if(this.zoom){
                 		var zoom = this.zoom * 10;
                 		var forWidth = 100+zoom;
 						var forHeight = 100+zoom;
 						ctx.drawImage(this, -forWidth/2, -forHeight/2, forWidth, forHeight);
-                    } else {
+                    }else{
 						ctx.drawImage(this, -50, -50, 100, 100);
                     }
                 });
-                if(image) {
+                if(image){
                     img.src = URL.createObjectURL(image);
                 } else {
                     img.src = 'https://pbs.twimg.com/profile_images/741290730170122240/abfazODg_400x400.jpg';
@@ -121,14 +121,16 @@
 				ctx.restore();
 				ctx.save();
             }
+
 			_zoomin(){
 				const canvas = this.$.canvas;
 				const ctx = canvas.getContext('2d');
 				var zoom = Number(this.$.zoom.value);
                 this.$.zoom.value = zoom + 1;
 				var newzoom = Number(this.$.zoom.value);
-                this._drawCanvas(this.image, newzoom);
+                this._drawCanvas(this.image,newzoom);
 			}
+
 			_zoomout(){
 				const canvas = this.$.canvas;
 				const ctx = canvas.getContext('2d');
