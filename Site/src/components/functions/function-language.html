@@ -13,16 +13,40 @@
              */
             defulatLanguage() {
                 return new Promise((resolve, reject) => {
-
+                    const str = navigator.language || navigator.userLanguage;
+                    const res = str.split('-');
+                    const language = res[0];
+                    resolve(language);
                 });
             }
             /**
              *  translation available
              * @return {object} object represents an error or a location object
              */
-            translationAvailable() {
+            translationAvailable(language) {
                 return new Promise((resolve, reject) => {
-
+                    const xobj = new XMLHttpRequest();
+                    xobj.overrideMimeType('application/json');
+                    xobj.open('GET', '../src/text-translations.json', true);
+                    xobj.onreadystatechange = () => {
+                        if (xobj.readyState == 4 && xobj.status == '200') {
+                            const json = JSON.parse(xobj.responseText);
+                            const keys = Object.keys(json);
+                            const arr = keys.indexOf(language);
+                            if (arr != -1) {
+                                resolve({
+                                    language: language,
+                                    found: true,
+                                });
+                            } else {
+                                resolve({
+                                    language: language,
+                                    found: false,
+                                });
+                            }
+                        }
+                    };
+                    xobj.send(null);
                 });
             }
 
