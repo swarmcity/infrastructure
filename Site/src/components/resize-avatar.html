@@ -63,13 +63,13 @@
             */
             _drawCanvas(image, zoom){
                 const canvas = this.$.canvas;
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
                 canvas.width = 250;
                 canvas.height = 250;
-                const ctx = canvas.getContext('2d');
                 ctx.fillStyle = "#333333";
                 ctx.fillRect(0,0,250,250);
                 ctx.translate(canvas.width/2,canvas.height/2);
-                const img = new Image();
                 img.crossOrigin = "anonymous";
 				img.zoom = zoom;
                 img.addEventListener('load', function (zoom) {
@@ -78,7 +78,7 @@
                 		var forWidth = 100+zoom;
 						var forHeight = 100+zoom;
 						ctx.drawImage(this, -forWidth/2, -forHeight/2, forWidth, forHeight);
-                    }else{
+                    } else {
 						ctx.drawImage(this, -50, -50, 100, 100);
                     }
                 });
@@ -107,7 +107,7 @@
 			}
             _save(){
                 const canvas = this.$.canvas;
-                var jpegUrl = canvas.toDataURL("image/jpeg");
+                const jpegUrl = canvas.toDataURL("image/jpeg");
                 console.log(jpegUrl);
             }
             _rotate(){
@@ -125,18 +125,18 @@
 			_zoomin(){
 				const canvas = this.$.canvas;
 				const ctx = canvas.getContext('2d');
-				var zoom = Number(this.$.zoom.value);
+				const zoom = Number(this.$.zoom.value);
                 this.$.zoom.value = zoom + 1;
-				var newzoom = Number(this.$.zoom.value);
+				const newzoom = Number(this.$.zoom.value);
                 this._drawCanvas(this.image,newzoom);
 			}
 
 			_zoomout(){
 				const canvas = this.$.canvas;
 				const ctx = canvas.getContext('2d');
-				var zoom = Number(this.$.zoom.value);
+				const zoom = Number(this.$.zoom.value);
 				this.$.zoom.value = zoom - 1;
-				var newzoom = Number(this.$.zoom.value);
+				const newzoom = Number(this.$.zoom.value);
 				if(zoom != -10) {
 					this._drawCanvas(this.image, newzoom);
 				}
