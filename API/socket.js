@@ -1,9 +1,15 @@
 "use strict";
+
 const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
+
 let queue = [];
+let connected = [];
+
+// Implemented from...  https://github.com/swarmcity/sc-protocol-docs/issues/20
+
 /**
  * Start
  */
@@ -16,7 +22,6 @@ let queue = [];
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getFx',
-        error: '_errorFx',
         publicKey: 0,
     }
     _queue(getFx, 'add');
@@ -26,7 +31,6 @@ let queue = [];
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getHashtags',
-        error: '_errorHashtags',
         publicKey: 0,
     }
     _queue(getHashtags, 'add');
@@ -36,7 +40,6 @@ let queue = [];
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getGasPrice',
-        error: '_errorGasPrice',
         publicKey: 0,
     }
     _queue(getGasPrice, 'add');
@@ -46,14 +49,10 @@ let queue = [];
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getHealth',
-        error: '_errorHealth',
         publicKey: 0,
     }
     _queue(getHealth, 'add');
     // start the queue manager
-    setTimeout(function(){ 
-        _queue(getHealth, 'remove');
-     }, 3000);
     _queueManager();
 })();
 
@@ -90,35 +89,66 @@ io.on('connect', (socket) => {
     });
 });
 
-// the queue will need add, remove and return, not update!
-// direction is 'add' or 'remove'
-// if the direction is remove then a public key and toDo must be provided
-
+/** 
+* the queue will need add, remove and return, not update!
+* direction is 'add' or 'remove'
+* if the direction is remove then a public key and toDo must be provided
+*/
 function _queue(task, direction) {
     if(task && direction == 'add'){
         queue.push(task);
-        // make a log
+        _eventLog(task, 'add to queue');
     } else if (task && direction == 'remove'){
         queue = queue.filter(function(obj) {
-            return (obj.publicKey !== task.publicKey || obj.toDo !== task.toDo); // Double santiy check this the || feels wrong!!
+            return (obj.publicKey != task.publicKey || obj.toDo != task.toDo); // Double santiy check this the || feels wrong, but works!!
         });
-        // make a log
-    } else {
-        return queue;
-    }
-    console.log(queue)
+        _eventLog(task, 'remove from queue');
+    } 
 }
 
+/** 
+* Each second filter the queue for tasks that need tobe done and pass them to the task schedulree
+*/
 function _queueManager() {
     console.log('queueManager')
-    // start checking the queue every second for items with a next_run time less than or equal to the time now
-    const queue = _queue();
-    const timeNow = (new Date).getTime();
+    setInterval(() => { 
+        const timeNow = (new Date).getTime();
+        let tasksToDo = queue.filter(function(obj) {
+            return (obj.nextRun <= timeNow);
+        });
+        _taskSheduler(tasksToDo);
+    }, 1000);
+
+}
+
+
+function _taskSheduler(tasksToDo) {
+// make an array and only push ino items that are not a duplicate from whats already in 
+// make a promise loop
+// one after another call the function in the task, passing the task itself into the function
 }
 
 function _blockWatcher() {
-    console.log('blockWatcher')
-    // start checking for a new block
+    setInterval(() => { 
+        // ask parity if a new block has been born
+        let blockFound = false;
+        if(blockFound == true){
+            // loop over all connected users
+            // for each user push the below into an array
+            // make log
+            
+            // const getBalance = {
+            //     lastRun: 0,
+            //     nextRun: 0,
+            //     interval: 0,
+            //     toDo: '_getBalance',
+            //     publicKey: 0,
+            // }
+
+            // When done send the array to the task scheduler
+            _taskSheduler(getBalance);
+        }
+    }, 3000);
     // if you find a new block get the balance for each connected user
 }
 function _eventLog(item, type) {
@@ -131,6 +161,15 @@ function _errorLog(item, type) {
     // start checking for a new block
     // if you find a new block get the balance for each connected user
 }
+
+/**
+*Tasks
+*/
+function _getFx(){}
+function _getHashtags(){}
+function _getGasPrice(){}
+function _getHealth(){}
+
 
 const PORT = 8011;
 const HOST = '0.0.0.0';
