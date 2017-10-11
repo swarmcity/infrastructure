@@ -12,6 +12,7 @@
     "src/my-geohash-distance.html",
     "src/my-translation-available.html",
     "src/my-default-language.html",
+    "src/my-old-wallet.html",
     "src/my-view404.html"
   ],
   "sources": [
