@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/unlock-wallet.html">
+
+<dom-module id="my-unlock-wallet">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <unlock-wallet></unlock-wallet>
+    </div>
+  </template>
+
+  <script>
+    class MyUnlockWallet extends Polymer.Element {
+      static get is() { return 'my-unlock-wallet'; }
+
+    } window.customElements.define(MyUnlockWallet.is, MyUnlockWallet);
+  </script>
+</dom-module>

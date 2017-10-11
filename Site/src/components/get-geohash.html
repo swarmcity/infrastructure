@@ -1,0 +1,85 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-location.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="get-geohash">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-location id="location"></function-location>
+        <div class="container">
+
+            <h1>Get Geohash</h1>
+            <p><b>By clicking below you are granting access to your location</p>
+                <paper-button toggles raised on-click="_getGeoHash">Get Geohash</paper-button>
+                <template is="dom-if" if="{{geoHash}}">
+                    <p>Latitude: {{latitude}}</p>
+                    <p>Longitude: {{longitude}}</p>
+                    <p>Geohash: {{geoHash}}</p>
+                    <paper-button toggles raised on-click="_goMap">Show on Map</paper-button>
+                </template>
+        </div>
+    </template>
+    <script>
+        class GetGeohash extends Polymer.Element {
+            static get is() {
+                return 'get-geohash';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    latitude: {
+                        type: Number,
+                    },
+                    longitude: {
+                        type: Number,
+                    },
+                    geoHash: {
+                        type: String,
+                    }
+                };
+            }
+
+            /**
+            * Fired when the user clicks the button
+            * @param {event} event The event from the on-change
+            */
+            _getGeoHash() {
+                console.log('Starting');
+                this.$.location.getLocation()
+                .then((location) => {
+                    this.latitude = location.latitude;
+                    this.longitude = location.longitude;
+                    console.log('Got Location');
+                    return this.$.location.toGeohash(location.latitude, location.longitude)
+                })
+                .then((geoHash) => {
+                    this.geoHash = geoHash;
+                    console.log('Got Geohash');
+                });
+            }
+
+            _goMap(){
+                window.location.href = 'https://www.google.com/maps/place/'+this.latitude+','+this.longitude;
+            }
+
+        } window.customElements.define(GetGeohash.is, GetGeohash);
+    </script>
+</dom-module>
+

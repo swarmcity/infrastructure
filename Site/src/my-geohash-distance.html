@@ -1,8 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
-<link rel="import" href="components/unlock-wallet.html">
+<link rel="import" href="components/geohash-distance.html">
 
-<dom-module id="my-dashboard">
+<dom-module id="my-geohash-distance">
     <template>
         <style include="shared-styles">
         :host {
@@ -12,14 +12,14 @@
         </style>
 
     <div class="card">
-        <unlock-wallet></unlock-wallet>
+        <geohash-distance></geohash-distance>
     </div>
   </template>
 
   <script>
-    class MyDashboard extends Polymer.Element {
-      static get is() { return 'my-dashboard'; }
+    class MyGeohashDistance extends Polymer.Element {
+      static get is() { return 'my-geohash-distance'; }
 
-    } window.customElements.define(MyDashboard.is, MyDashboard);
+    } window.customElements.define(MyGeohashDistance.is, MyGeohashDistance);
   </script>
 </dom-module>

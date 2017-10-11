@@ -3,8 +3,9 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="functions/function-wallet.html">
 <link rel="import" href="../shared-styles.html">
+<script src="functions/lightwallet.min.js"></script>
 
-<dom-module id="unlock-wallet">
+<dom-module id="old-wallet">
     <template>
         <style>
             :host {
@@ -22,7 +23,8 @@
         <function-wallet id="wallet"></function-wallet>
         <div class="container">
 
-            <h1>Unlock Wallet</h1>
+            <h1>Old Wallet</h1>
+            <p><b>Import a legacy swarm city wallet</b></p>
             <p><b>Before you supply keys</b> confirm the url in the browser is https://website.com</p>
             <p><b>Double Check!</b> If you supply keys to a malicious/phishing site, your funds will be stolen.</p>
             
@@ -40,9 +42,9 @@
         </div>
     </template>
     <script>
-        class UnlockWallet extends Polymer.Element {
+        class OldWallet extends Polymer.Element {
             static get is() {
-                return 'unlock-wallet';
+                return 'old-wallet';
             }
             static get properties() {
                 return {
@@ -83,7 +85,7 @@
                 let reader = new FileReader();
                 reader.readAsText(file);
                 reader.onload = () => {
-                    this.keystore = JSON.parse(reader.result);
+                    this.wallet = JSON.parse(reader.result);
                     this.askPassword = true;
                 };
                 reader.onerror = (error) => {
@@ -93,20 +95,23 @@
         }
 
         _checkPassword(){
-            if(this.password.length >= 10){
+            if(this.password.length >= 5){
                 this.disabled = false;
             } else {
                 this.disabled = true;
             }
         }
-        _decrypt(keystore){
-            this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
-            .then((data) => {
-                console.log(data);
-            })
+        _decrypt(){
+            const keystore = lightwallet.keystore.deserialize(this.wallet.keystore);
+            keystore.keyFromPassword(this.password, function(err, pwDerivedKey) {
+                if(!err){
+                    var privatekey = keystore.exportPrivateKey('0x' + keystore.getAddresses()[0], pwDerivedKey);
+                    console.log(privatekey);
+                }
+            });
         }
         
-        } window.customElements.define(UnlockWallet.is, UnlockWallet);
+        } window.customElements.define(OldWallet.is, OldWallet);
     </script>
 </dom-module>
 

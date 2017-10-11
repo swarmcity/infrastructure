@@ -26,6 +26,25 @@
                 });
             }
             /**
+            * create a keystire from private key and password
+            * @return {utcKeyStore} utcKeyStore
+            */
+            restoreKey(suppliedPrivateKey, password) {
+                return new Promise((resolve, reject) => {
+                    const Buffer = dragon.Buffer.Buffer;
+                    const privateKey = new Buffer(suppliedPrivateKey, 'hex');
+                    const publicKey = dragon.privateToPublic(privateKey);
+                    const address = dragon.publicToAddress(publicKey);
+                    const hexPrivateKey = privateKey.toString('hex');
+                    const hexAddress = dragon.toChecksumAddress(`0x${address.toString('hex')}`);
+                    if(privateKey.length === 32 && hexPrivateKey.length === 64 && hexAddress.length === 42){
+                        resolve(this.utcKeystore(privateKey, hexAddress, password));
+                    } else {
+                        reject();
+                    }
+                });
+            }
+            /**
             * create a address from public key
             * @return {utcKeyStore} utcKeyStore
             */

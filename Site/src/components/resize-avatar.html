@@ -1,0 +1,148 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="functions/function-message.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="resize-avatar">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .canvas {
+                border: 1px solid black
+            }
+            .file {
+                display: none;
+            }
+            .pointer {
+                cursor: pointer;
+            }
+        </style>
+        <function-message id="message"></function-message>
+        <div class="container">
+            <h1>Resize Avatar</h1>
+            <canvas id="canvas" class="canvas"></canvas>
+            <input type="file" name="file" id="file" class="file" on-change="_getFile"/>
+            <input type="hidden" name="zoom" id="zoom" value="1">
+            </br>
+            <label for="file">
+                <p class="pointer">Select</p>
+            </label>
+            <p on-click="_rotate" class="pointer">Rotate</p>
+            <p on-click="_save" class="pointer">Save</p>
+            <p on-click="_reset" class="pointer">Reset</p>
+            <p on-click="_zoomin" class="pointer">Zoom +</p>
+            <p on-click="_zoomout" class="pointer">Zoom -</p>
+        </div>
+    </template>
+    <script>
+        class ResizeAvatar extends Polymer.Element {
+            static get is() {
+                return 'resize-avatar';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+            ready() {
+                super.ready();
+                this._drawCanvas(null);
+            }
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _drawCanvas(image, zoom){
+                const canvas = this.$.canvas;
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                canvas.width = 250;
+                canvas.height = 250;
+                ctx.fillStyle = "#333333";
+                ctx.fillRect(0,0,250,250);
+                ctx.translate(canvas.width/2,canvas.height/2);
+                img.crossOrigin = "anonymous";
+				img.zoom = zoom;
+                img.addEventListener('load', function (zoom) {
+                	if(this.zoom){
+                		var zoom = this.zoom * 10;
+                		var forWidth = 100+zoom;
+						var forHeight = 100+zoom;
+						ctx.drawImage(this, -forWidth/2, -forHeight/2, forWidth, forHeight);
+                    } else {
+						ctx.drawImage(this, -50, -50, 100, 100);
+                    }
+                });
+                if(image){
+                    img.src = URL.createObjectURL(image);
+                } else {
+                    img.src = 'https://pbs.twimg.com/profile_images/741290730170122240/abfazODg_400x400.jpg';
+                }
+            }
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                this.image = event.target.files[0];
+				this.$.zoom.value = 1;
+                this.$.file.value = "";
+                this._drawCanvas(this.image);
+            }
+            _reset(){
+                this._drawCanvas();
+				this.image = '';
+				this.$.zoom.value = '';
+			}
+            _save(){
+                const canvas = this.$.canvas;
+                const jpegUrl = canvas.toDataURL("image/jpeg");
+                console.log(jpegUrl);
+            }
+            _rotate(){
+                const canvas = this.$.canvas;
+                const ctx = canvas.getContext('2d');
+				ctx.clearRect(0,0,0,0);
+				ctx.save();
+				ctx.translate(canvas,Number(canvas.width)/2,Number(canvas.height)/2);
+				ctx.rotate(1.570);
+				ctx.drawImage(canvas,-Number(canvas.width)/2,-Number(canvas.height)/2);
+				ctx.restore();
+				ctx.save();
+            }
+
+			_zoomin(){
+				const canvas = this.$.canvas;
+				const ctx = canvas.getContext('2d');
+				const zoom = Number(this.$.zoom.value);
+                this.$.zoom.value = zoom + 1;
+				const newzoom = Number(this.$.zoom.value);
+                this._drawCanvas(this.image,newzoom);
+			}
+
+			_zoomout(){
+				const canvas = this.$.canvas;
+				const ctx = canvas.getContext('2d');
+				const zoom = Number(this.$.zoom.value);
+				this.$.zoom.value = zoom - 1;
+				const newzoom = Number(this.$.zoom.value);
+				if(zoom != -10) {
+					this._drawCanvas(this.image, newzoom);
+				}
+			}
+
+        } window.customElements.define(ResizeAvatar.is, ResizeAvatar);
+    </script>
+</dom-module>
+

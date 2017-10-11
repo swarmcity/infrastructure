@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-language.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="default-language">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-language id="language"></function-language>
+        <div class="container">
+            <h1>Default Language</h1>
+            <p><b>Your default language is set to: {{language}}</p>
+        </div>
+    </template>
+    <script>
+        class DefaultLanguage extends Polymer.Element {
+            static get is() {
+                return 'default-language';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * the users language
+                    * @type {Object}
+                    */
+                    language: {
+                        type: String,
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+                this.$.language.defulatLanguage()
+                .then((language) => {
+                    this.language = language;
+                })
+            }
+
+        } window.customElements.define(DefaultLanguage.is, DefaultLanguage);
+    </script>
+</dom-module>
+

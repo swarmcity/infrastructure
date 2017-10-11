@@ -1,0 +1,151 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-wallet.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="restore-wallet">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .icon {
+                border-radius: 50%;
+            }
+            .address{
+                width: 164px;
+                height: 164px;
+            }
+            .private-key{
+                width: 164px;
+                height: 164px;
+            }
+        </style>
+        <function-wallet id="wallet"></function-wallet>
+        <div class="container">
+
+            <template is="dom-if" if="{{statePassword}}">
+                <h1>Restore Wallet</h1>
+                <p>Create a Keystore from a private key, the private key can come from any wallet</p>
+                <paper-input label="Private Key" value="{{privateKey}}"></paper-input>
+                <paper-input char-counter label="Password" value="{{password}}"></paper-input>
+                <paper-button toggles raised on-click="_restoreWallet">Restore Wallet</paper-button>
+                <p>This password encrypts your private key. This does not act as a seed to generate your keys. You will need this password + your private key to unlock your wallet.</p>
+            </template>
+
+            <template is="dom-if" if="{{stateDownload}}">
+                <h1>Save your Keystore File.</h1>
+                <paper-button toggles raised on-click="_download">Download Keystore File</paper-button>
+                <p><b>Do not lose it!</b> It cannot be recovered if you lose it.</p>
+                <p><b>Do not share it!</b> Your funds will be stolen if you use this file on a malicious/phishing site.</p>
+                <p><b>Make a backup!</b> Secure it like the millions of dollars it may one day be worth.</p>
+                <paper-button toggles raised disabled="{{disabled}}" on-click="_continue">I Understand. Continue.</paper-button>
+            </template>
+
+            <template is="dom-if" if="{{stateSaveKey}}">
+                    <h1>Save Your Private Key.</h1>
+                    <paper-button toggles raised on-click="_print">Print Paper Wallet</paper-button>
+                    </br></br>
+                    <paper-input label="Private key" value="{{privateKey}}"></paper-input>
+                    <p><b>Do not lose it!</b> It cannot be recovered if you lose it.</p>
+                    <p><b>Do not share it!</b> Your funds will be stolen if you use this file on a malicious/phishing site.</p>
+                    <p><b>Make a backup!</b> Secure it like the millions of dollars it may one day be worth.</p>
+                    <paper-button toggles raised disabled="{{disabled}}" on-click="_home">Done.</paper-button>
+            </template>
+
+            
+        </div>
+    </template>
+    <script>
+        class RestoreWallet extends Polymer.Element {
+            static get is() {
+                return 'restore-wallet';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * password indicates if the user is entering a password
+                    * @type {Boolean}
+                    */
+                    statePassword: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * state Save Key indicates if the user is entering a password
+                    * @type {Boolean}
+                    */
+                    stateSaveKey: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    /**
+                    * is the continue button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                };
+            }
+
+            _restoreWallet() {
+                if(this.password){
+                    this.statePassword = false;
+                    this.stateDownload = true;
+                    this.$.wallet.restoreKey(this.privateKey, this.password)
+                    .then((data) => {
+                        this.wallet = data;
+                        localStorage.setItem("utcKeystore", JSON.stringify(data.utcKeystore));
+                    })
+                }
+            }
+            _download(){
+                const filename = this.wallet.fileName;
+                const text = JSON.stringify(this.wallet.utcKeystore);
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                this.disabled = false;
+            }
+            _continue(){
+                this.stateDownload = false;
+                this.stateSaveKey = true;
+                this.privateKey = this.wallet.privateKey
+            }
+            _print(){
+                this.$.wallet.makeQRCode(this.wallet.address)
+                .then((addressQR) => {
+                        this.addressQR = addressQR;
+                });
+                this.$.wallet.makeQRCode(this.wallet.privateKey)
+                .then((privateKeyQR) => {
+                        this.privateKeyQR = privateKeyQR;
+                })
+                .then(() => {
+                    var myWindow = window.open("", "MsgWindow", "width=800,height=600", "_blank");
+                    myWindow.document.write("<title>Print Paper Wallet</title><img src='"+this.addressQR+"' class='address'><p>Your Ethereum Address: "+this.wallet.address+"</p><img src='"+this.privateKeyQR+"' class='private-key'><p>Your Private Key: "+this.wallet.privateKey+"</p>");
+                    setTimeout(function () { myWindow.print(); }, 200);
+                    myWindow.onfocus = function () { setTimeout(function () { myWindow.close(); }, 200); }
+                })
+                
+            }
+
+        } window.customElements.define(RestoreWallet.is, RestoreWallet);
+    </script>
+</dom-module>
+

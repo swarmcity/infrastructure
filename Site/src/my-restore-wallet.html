@@ -1,0 +1,26 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/restore-wallet.html">
+
+<dom-module id="my-restore-wallet">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+      <restore-wallet></restore-wallet>
+    </div>
+  </template>
+
+  <script>
+    class MyRestoreWallet extends Polymer.Element {
+      static get is() { return 'my-restore-wallet'; }
+    }
+
+    window.customElements.define(MyRestoreWallet.is, MyRestoreWallet);
+  </script>
+</dom-module>

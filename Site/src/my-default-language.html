@@ -1,0 +1,23 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/default-language.html">
+
+<dom-module id="my-default-language">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+        <div class="card">
+            <default-language></default-language>
+        </div>
+    </template>
+
+    <script>
+    class MyDefaultLanguage extends Polymer.Element {
+        static get is() { return 'my-default-language'; }
+    } window.customElements.define(MyDefaultLanguage.is, MyDefaultLanguage);
+    </script>
+</dom-module>

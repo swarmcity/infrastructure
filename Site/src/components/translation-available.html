@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-language.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="translation-available">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-language id="language"></function-language>
+        <div class="container">
+            <h1>Translation Available</h1>
+            <p><b>Your default language is set to: {{language}}</b></p>
+            <p><b>Your default language is available: {{available}}</b></p>
+        </div>
+    </template>
+    <script>
+        class TranslationAvailable extends Polymer.Element {
+            static get is() {
+                return 'translation-available';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * the users language
+                    * @type {Object}
+                    */
+                    language: {
+                        type: String,
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+                this.$.language.defulatLanguage()
+                .then((language) => {
+                    this.language = language;
+                    return this.$.language.translationAvailable(language);
+                })
+                .then((available) => {
+                    this.available = available.found
+                })
+            }
+
+        } window.customElements.define(TranslationAvailable.is, TranslationAvailable);
+    </script>
+</dom-module>
+
