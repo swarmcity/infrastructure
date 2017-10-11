@@ -60,7 +60,7 @@ let connected = [];
  * Connect
  */
 io.on('connect', (socket) => {
-    //push get balance to the queue
+    socket.emit('connected');
     console.log('connected')
     /**
      * Disconnect
@@ -72,20 +72,35 @@ io.on('connect', (socket) => {
     /**
      * One Time Requests
      */
-    socket.on('requests', (socket) => {
-        console.log('requests')
+    socket.on('requests', (data, response) => {
+        console.log('requests');
+        response({
+            status: 200,
+        });
     });
-    socket.on('broadcastTransaction', (socket) => {
-        console.log('broadcastTransaction')
+    socket.on('broadcastTransaction', (data, response) => {
+        console.log('broadcastTransaction');
+        response({
+            status: 200,
+        });
     });
-    socket.on('saveAvatar', (socket) => {
-        console.log('saveAvatar')
+    socket.on('saveAvatar', (data, response) => {
+        console.log('saveAvatar');
+        response({
+            status: 200,
+        });
     });
-    socket.on('getNoonce', (socket) => {
-        console.log('getNoonce')
+    socket.on('getNoonce', (data, response) => {
+        console.log('getNoonce');
+        response({
+            status: 200,
+        });
     });
-    socket.on('saveError', (socket) => {
-        console.log('saveError')
+    socket.on('saveError', (data, response) => {
+        console.log('saveError');
+        response({
+            status: 200,
+        });
     });
 });
 
@@ -100,10 +115,12 @@ function _queue(task, direction) {
         _eventLog(task, 'add to queue');
     } else if (task && direction == 'remove'){
         queue = queue.filter(function(obj) {
-            return (obj.publicKey != task.publicKey || obj.toDo != task.toDo); // Double santiy check this the || feels wrong, but works!!
+            return (obj.publicKey != task.publicKey || obj.toDo != task.toDo); // Double santiy check this the "||"" feels wrong, but works!!
         });
         _eventLog(task, 'remove from queue');
-    } 
+    } else {
+        _errorLog(task, 'unhandled queue error')
+    }
 }
 
 /** 
@@ -165,19 +182,29 @@ function _taskSheduler(tasksToDo) {
 * Tasks
 */
 function _getFx(task){
-    console.log('getFx', task);
+    return new Promise((resolve, reject) => {
+        console.log('getFx', task);
+    })
 };
 function _getHashtags(task){
-    console.log('getHashtags', task);
+    return new Promise((resolve, reject) => {
+        console.log('getHashtags', task);
+    })
 };
 function _getGasPrice(task){
-    console.log('getGasPrice', task);
+    return new Promise((resolve, reject) => {
+        console.log('getGasPrice', task);
+    })
 };
 function _getHealth(task){
-    console.log('getHealth', task);
+    return new Promise((resolve, reject) => {
+        console.log('getHealth', task);
+    })
 };
 function _getBalance(task){
-    console.log('getBalance', task);
+    return new Promise((resolve, reject) => {
+        console.log('getBalance', task);
+    })
 };
 
 /**
