@@ -6,17 +6,14 @@ const io = require('socket.io')(server);
 const Web3 = require('web3');
 
 // connect
-
-const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'))
-//setTimeout(()=>web3.eth.getBlockNumber().then(console.log),500)
-
-// var web3 = new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8546"));
-console.log(Web3.version);
-
+// const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'))
 // var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
-//     if (!error){console.log(error)}
+//     if (!error){
+//         console.log(error)
+//     }
 // })
-//     .on("data", function(blockHeader){
+// .on("data", function(blockHeader){
+//         console.log(blockHeader);
 // })
 
 // install fs and save logs to txt file
@@ -34,7 +31,6 @@ let connected = [];
     const timeNow = (new Date).getTime();
     //push get FX to the queue
     const getFx = {
-        lastRun: timeNow,
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getFx',
@@ -43,7 +39,6 @@ let connected = [];
     _queue(getFx, 'add');
     //push get Hashtags to the queue
     const getHashtags = {
-        lastRun: timeNow,
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getHashtags',
@@ -52,7 +47,6 @@ let connected = [];
     _queue(getHashtags, 'add');
     //push get Gas Price to the queue
     const getGasPrice = {
-        lastRun: timeNow,
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getGasPrice',
@@ -61,7 +55,6 @@ let connected = [];
     _queue(getGasPrice, 'add');
     //push get Health to the queue
     const getHealth = {
-        lastRun: timeNow,
         nextRun: timeNow,
         interval: 300000,
         toDo: '_getHealth',
@@ -75,48 +68,39 @@ let connected = [];
 /**
  * Connect
  */
-io.on('connect', (socket) => {
-    socket.emit('connected');
-    console.log('connected')
+io.on('connection', function (socket) {
+    const user = {socketId: socket.id, publicKey: socket.handshake.query.publicKey};
+    connected.push(user);
     /**
      * Disconnect
      */
-    socket.on('disconnect', (socket) => {
-        // Remove all the items from the queue for this socket
-        console.log('disconnected')
+    socket.on('disconnect', () => {
+        connected = connected.filter(function(obj) {
+            return (obj.socketId != user.socketId);
+        });
     });
     /**
      * One Time Requests
      */
     socket.on('requests', (data, response) => {
-        console.log('requests');
-        response({
-            status: 200,
-        });
+        console.log('requests', data);
+        response({status: 200});
     });
     socket.on('broadcastTransaction', (data, response) => {
-        console.log('broadcastTransaction');
-        response({
-            status: 200,
-        });
+        console.log('broadcastTransaction', data);
+        response({status: 200});
     });
     socket.on('saveAvatar', (data, response) => {
-        console.log('saveAvatar');
-        response({
-            status: 200,
-        });
+        console.log('saveAvatar', data);
+        response({status: 200});
     });
     socket.on('getNoonce', (data, response) => {
-        console.log('getNoonce');
-        response({
-            status: 200,
-        });
+        console.log('getNoonce', data);
+        response({status: 200});
     });
     socket.on('saveError', (data, response) => {
-        console.log('saveError');
-        response({
-            status: 200,
-        });
+        console.log('saveError', data);
+        response({status: 200});
     });
 });
 
