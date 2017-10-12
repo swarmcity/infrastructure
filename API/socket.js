@@ -5,6 +5,22 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 
+// connect
+
+const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'))
+//setTimeout(()=>web3.eth.getBlockNumber().then(console.log),500)
+
+// var web3 = new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8546"));
+console.log(Web3.version);
+
+// var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
+//     if (!error){console.log(error)}
+// })
+//     .on("data", function(blockHeader){
+// })
+
+// install fs and save logs to txt file
+
 let queue = [];
 let connected = [];
 
@@ -173,7 +189,8 @@ function _blockWatcher() {
 * Once a job has been completed its removed from the queue or rescheduled
 */
 function _taskSheduler(tasksToDo) {
-// make an array and only push ino items that are not a duplicate from whats already in 
+// define an array outside this function
+// only push in items that are not a duplicate from whats already in 
 // make a promise loop
 // one after another call the function in the task, passing the task itself into the function
 }
