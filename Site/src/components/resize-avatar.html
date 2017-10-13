@@ -98,12 +98,12 @@
                 ctx.fillStyle = "#333333";
                 ctx.fillRect(0, 0, width, height);
                 ctx.beginPath();
-                ctx.arc(width/2, height/2, Math.min(width/2, height/2)/2 - 10, 0, 2 * Math.PI);
-                ctx.lineWidth = 10;
+                ctx.arc(width/2, height/2, Math.min(100, 100)/2 - 0, 0, 2 * Math.PI);
+                ctx.lineWidth = 4;
                 ctx.strokeStyle = "#24B1FF";
                 ctx.stroke();
                 ctx.beginPath();
-                ctx.arc(width/2, height/2, Math.min(width/2, height/2)/2 - 12, 0, 2 * Math.PI);
+                ctx.arc(width/2, height/2, Math.min(100, 100)/2 - 0, 0, 2 * Math.PI);
                 ctx.save();
                 ctx.clip();
                 ctx.translate(tX + left, tY + top);
