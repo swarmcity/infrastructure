@@ -5,16 +5,8 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 
-// connect
-// const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://34.194.93.255:8546'))
-// var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
-//     if (!error){
-//         console.log("A");
-//     } else {
-//         console.log(error);
-//     }
-// })
-
+//connect
+const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://34.194.93.255:8546'))
 
 // install fs and save logs to txt file
 
@@ -63,6 +55,7 @@ let connected = [];
     _queue(getHealth, 'add');
     // start the queue manager
     _queueManager();
+    _blockWatcher();
 })();
 
 /**
@@ -141,13 +134,11 @@ function _queueManager() {
 * Watch the blockchain for a new block
 */
 function _blockWatcher() {
-    setInterval(() => { 
-        // ask parity if a new block has been born
-        // if one was found set block found to true
-        let blockFound = false;
-        let getBalanceFor = [];
-        if(blockFound == true){
-            // loop over all connected users
+    console.log('_blockWatcher');
+    var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
+        if (!error){
+            console.log("A");
+                        // loop over all connected users
             // for each user push the below into an array
             // make log
 
@@ -160,10 +151,10 @@ function _blockWatcher() {
             // }
 
             // When done send the array to the task scheduler
-            _taskSheduler(getBalanceFor);
+        } else {
+            console.log("error");
         }
-    }, 3000);
-    // if you find a new block get the balance for each connected user
+    })
 }
 
 
