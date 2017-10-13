@@ -6,15 +6,15 @@ const io = require('socket.io')(server);
 const Web3 = require('web3');
 
 // connect
-// const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'))
+// const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://34.194.93.255:8546'))
 // var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
 //     if (!error){
-//         console.log(error)
+//         console.log("A");
+//     } else {
+//         console.log(error);
 //     }
 // })
-// .on("data", function(blockHeader){
-//         console.log(blockHeader);
-// })
+
 
 // install fs and save logs to txt file
 
