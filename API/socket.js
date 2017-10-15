@@ -10,8 +10,11 @@ const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://34.194.93.255:8
 
 // install fs and save logs to txt file
 
-let queue = [];
 let connected = [];
+let queue = [];
+let processing = [];
+let taskInProgress = false;
+
 
 // Implemented from...  https://github.com/swarmcity/sc-protocol-docs/issues/20
 
@@ -25,7 +28,7 @@ let connected = [];
     const getFx = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: '_getFx',
+        toDo: _getFx,
         publicKey: 0,
     }
     _queue(getFx, 'add');
@@ -33,7 +36,7 @@ let connected = [];
     const getHashtags = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: '_getHashtags',
+        toDo: _getHashtags,
         publicKey: 0,
     }
     _queue(getHashtags, 'add');
@@ -41,7 +44,7 @@ let connected = [];
     const getGasPrice = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: '_getGasPrice',
+        toDo: _getGasPrice,
         publicKey: 0,
     }
     _queue(getGasPrice, 'add');
@@ -49,7 +52,7 @@ let connected = [];
     const getHealth = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: '_getHealth',
+        toDo: _getHealth,
         publicKey: 0,
     }
     _queue(getHealth, 'add');
@@ -64,12 +67,22 @@ let connected = [];
 io.on('connection', function (socket) {
     const user = {socketId: socket.id, publicKey: socket.handshake.query.publicKey};
     connected.push(user);
+    const getBalance = {
+        nextRun: 0,
+        interval: 0,
+        toDo: _getBalance,
+        publicKey: user.publicKey,
+    }
+    _queue(getBalance, 'add');
     /**
      * Disconnect
      */
     socket.on('disconnect', () => {
         connected = connected.filter(function(obj) {
             return (obj.socketId != user.socketId);
+        });
+        queue = queue.filter(function(obj) {
+            return (obj.publicKey != user.publicKey);
         });
     });
     /**
@@ -101,10 +114,16 @@ io.on('connection', function (socket) {
 * the queue will need add, remove and return, not update!
 * direction is 'add' or 'remove'
 * if the direction is remove then a public key and toDo must be provided
+* ensure the queue does not have duplicates
 */
 function _queue(task, direction) {
     if(task && direction == 'add'){
-        queue.push(task);
+        var isDuplicate = queue.filter(function(obj) {
+            return (obj.publicKey == task.publicKey && obj.toDo == task.toDo);
+        }); 
+        if(isDuplicate.length == 0){
+            queue.push(task);
+        }
         _eventLog(task, 'add to queue');
     } else if (task && direction == 'remove'){
         queue = queue.filter(function(obj) {
@@ -134,50 +153,49 @@ function _queueManager() {
 * Watch the blockchain for a new block
 */
 function _blockWatcher() {
-    console.log('_blockWatcher');
     var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
         if (!error){
-            console.log("A");
-                        // loop over all connected users
-            // for each user push the below into an array
-            // make log
-
-            // const getBalance = {
-            //     lastRun: 0,
-            //     nextRun: 0,
-            //     interval: 0,
-            //     toDo: '_getBalance',
-            //     publicKey: 0,
-            // }
-
-            // When done send the array to the task scheduler
+            connected.forEach(function(data){
+                const getBalance = {
+                    nextRun: 0,
+                    interval: 0,
+                    toDo: _getBalance,
+                    publicKey: data.publicKey,
+                }
+                _queue(getBalance, 'add');
+            });
         } else {
-            console.log("error");
+            _errorLog('_blockWatcher', 'unhandled subscription error')
         }
     })
 }
-
 
 /** 
 * Inserts jobs into the job schedular array as they arrive
 * he scheduled jobs are processed as fast as possible, one after another
 * Once a job has been completed its removed from the queue or rescheduled
 */
-function _taskSheduler(tasksToDo) {
-// define an array outside this function
-// only push in items that are not a duplicate from whats already in 
-// make a promise loop
-// one after another call the function in the task, passing the task itself into the function
+
+function _taskSheduler(actions){
+    console.log(actions)
+    return actions.reduce((chain, action) => {
+        return chain.then(() => action.toDo(action))
+        .then(val => console.log(val));
+    }, Promise.resolve());
 }
 
 /**
 * Tasks
 */
-function _getFx(task){
+function _getFx(data){
     return new Promise((resolve, reject) => {
-        console.log('getFx', task);
+        setTimeout(function(){  
+        console.log(data); 
+        resolve('resolvedFromOne');
+        }, 200);
     })
-};
+}
+
 function _getHashtags(task){
     return new Promise((resolve, reject) => {
         console.log('getHashtags', task);
@@ -203,7 +221,7 @@ function _getBalance(task){
 * Logs
 */
 function _eventLog(item, type) {
-    console.log(item, type)
+    //console.log(item, type)
     // start checking for a new block
     // if you find a new block get the balance for each connected user
 }
@@ -212,7 +230,6 @@ function _errorLog(item, type) {
     // start checking for a new block
     // if you find a new block get the balance for each connected user
 }
-
 
 const PORT = 8011;
 const HOST = '0.0.0.0';
