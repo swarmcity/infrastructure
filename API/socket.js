@@ -5,8 +5,11 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 
+// get the task functions
+require('tasks.js')();
+
 //connect
-const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://34.194.93.255:8546'))
+const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
 
 // install fs and save logs to txt file
 
@@ -190,44 +193,7 @@ function _taskSheduler(actions){
     }, Promise.resolve());
 }
 
-/**
-* Tasks
-*/
-function _getFx(data){
-    return new Promise((resolve, reject) => {
-        setTimeout(function(){  
-        console.log(data); 
-        resolve('resolvedFromOne');
-        }, 200);
-    })
-}
 
-function _getPendingTransactions(task){
-    return new Promise((resolve, reject) => {
-        console.log('getHashtags', task);
-    })
-};
-
-function _getHashtags(task){
-    return new Promise((resolve, reject) => {
-        console.log('getHashtags', task);
-    })
-};
-function _getGasPrice(task){
-    return new Promise((resolve, reject) => {
-        console.log('getGasPrice', task);
-    })
-};
-function _getHealth(task){
-    return new Promise((resolve, reject) => {
-        console.log('getHealth', task);
-    })
-};
-function _getBalance(task){
-    return new Promise((resolve, reject) => {
-        console.log('getBalance', task);
-    })
-};
 
 /**
 * Logs
