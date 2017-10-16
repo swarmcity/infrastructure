@@ -73,6 +73,12 @@ io.on('connection', function (socket) {
         toDo: _getBalance,
         publicKey: user.publicKey,
     }
+    const getPendingTransactions = {
+        nextRun: 0,
+        interval: 0,
+        toDo: _getPendingTransaction,
+        publicKey: user.publicKey,
+    }
     _queue(getBalance, 'add');
     /**
      * Disconnect
@@ -195,6 +201,12 @@ function _getFx(data){
         }, 200);
     })
 }
+
+function _getPendingTransactions(task){
+    return new Promise((resolve, reject) => {
+        console.log('getHashtags', task);
+    })
+};
 
 function _getHashtags(task){
     return new Promise((resolve, reject) => {
