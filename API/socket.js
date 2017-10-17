@@ -4,7 +4,8 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
-const tasks = require('./tasks.js')(_eventLog);
+const logs = require('./logs.js')();
+const tasks = require('./tasks.js')(logs._eventLog);
 
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
@@ -130,14 +131,14 @@ function _queue(task, direction) {
         if(isDuplicate.length == 0){
             queue.push(task);
         }
-        _eventLog(task, 'add to queue');
+        logs._eventLog(task, 'add to queue');
     } else if (task && direction == 'remove'){
         queue = queue.filter(function(obj) {
             return (obj.publicKey != task.publicKey || obj.toDo != task.toDo); // Double santiy check this the "||"" feels wrong, but works!!
         });
-        _eventLog(task, 'remove from queue');
+        logs._eventLog(task, 'remove from queue');
     } else {
-        _errorLog(task, 'unhandled queue error')
+        logs._errorLog(task, 'unhandled queue error')
     }
 }
 
@@ -192,15 +193,6 @@ function _taskScheduler(tasks){
     }
 }
 
-/**
-* Logs
-*/
-function _eventLog(item, type) {
-  console.log(item, type);
-}
-
-function _errorLog(item, type) {
-}
 
 const PORT = 8011;
 const HOST = '0.0.0.0';
