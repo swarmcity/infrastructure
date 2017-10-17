@@ -90,6 +90,15 @@ io.on('connection', function (socket) {
         publicKey: 0,
         socket: socket
     }
+    //push get Gas Price to the queue
+    const getGasPrice = {
+        nextRun: 0,
+        interval: 0,
+        toDo: tasks._getGasPrice,
+        publicKey: 0,
+        socket: socket
+    }
+    _queue(getGasPrice, 'add');
     _queue(getBalance, 'add');
     _queue(getFx, 'add');
     /**
