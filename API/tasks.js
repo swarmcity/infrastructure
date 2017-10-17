@@ -5,6 +5,7 @@ module.exports = function(web3){
 const getBalance = require('./tasks/getBalance.js')(web3);
 const getFx = require('./tasks/getFx.js')(web3);
 const getGasPrice = require('./tasks/getGasPrice.js')(web3);
+const getHashtags = require('./tasks/getHashtags.js')(web3);
 
 return {
   /**
@@ -35,11 +36,11 @@ return {
   },
 
   _getHashtags: function(queue, task){
-    return new Promise((resolve, reject) => {
-      // dummy hashtagslist
-      console.log('=========== GET HASHTAGS ============');
-      resolve('getHashtags');
-    })
+    return getHashtags._getHashtags(task.publicKey).then((res) => {
+      task.socket.emit('hashtagsChanged', res);
+      queue(task, "remove");
+      return res;
+    }).catch((err) => { console.log('get hashtags ERR! ', err)});
   },
 
   _getHealth: function(queue, task){

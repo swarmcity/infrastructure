@@ -98,6 +98,14 @@ io.on('connection', function (socket) {
         publicKey: 0,
         socket: socket
     }
+    const getHashtags = {
+        nextRun: 0,
+        interval: 0,
+        toDo: tasks._getHashtags,
+        publicKey: 0,
+        socket: socket
+    }
+    _queue(getHashtags, 'add');
     _queue(getGasPrice, 'add');
     _queue(getBalance, 'add');
     _queue(getFx, 'add');

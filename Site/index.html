@@ -77,6 +77,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           console.log('Got an FX event: ', data, response);
       });
 
+      socket.on('hashtagsChanged', (data, response) => {
+          //console.log('requests', data);
+          console.log('Got an HASHTAG event: ', data, response);
+      });
+
     </script>
     <script>
       /**
