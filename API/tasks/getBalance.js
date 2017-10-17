@@ -35,54 +35,17 @@ _getBalance: function(address) {
     tokens.forEach((token) => {
       var tokenContract = new web3.eth.Contract(minimeContract.abi, tokenIndex[token]);
       promisesList.push(tokenContract.methods.balanceOf(address).call().then((res) => {
-        return {  token: token,
-                  balance: res
+        return {  balance: res,
+                  publicKey: address,
+                  tokenSymbol: token,
+                  tokenContractAddress: tokenIndex[token],
+
               };
       }));
     });
 
     resolve(Promise.all(promisesList));
   });
-},
-
-/**
-* Returns the abi for the requests contract
-* @param {string} contractName is the name of the contract
-* @return {abi} abi repreents the contract's abi
-*/
-
-_loadAbi: function(contractName) {
-    return new Promise((resolve, reject) => {
-        fs.readFile('../base/src/contracts/' + contractName + '.json', (err, data) => {
-          if (err) throw err;
-          console.log(data);
-          const json = JSON.parse(data);
-          resolve(json);
-        });
-    });
-},
-
-/**
-* Returns the contract address
-* @param {string} contractName is the name of the contract
-* @return {string} contractAddress repreents the
-* contracts address on main-net
-*/
-_loadAddress: function(contractName) {
-    return new Promise((resolve, reject) => {
-        const xobj = new XMLHttpRequest();
-        const path = '../base/src/contracts/index.json';
-        xobj.overrideMimeType('application/json');
-        xobj.open('GET', path, true);
-        xobj.onreadystatechange = () => {
-            if (xobj.readyState == 4 && xobj.status == '200') {
-                const json = JSON.parse(xobj.responseText);
-                resolve(json);
-            }
-        };
-        // Request the json
-        xobj.send(null);
-    });
 }
 
 });

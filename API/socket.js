@@ -34,7 +34,7 @@ let taskInProgress = false;
         toDo: tasks._getFx,
         publicKey: 0,
     }
-    _queue(getFx, 'add');
+    //_queue(getFx, 'add');
     //push get Hashtags to the queue
     const getHashtags = {
         nextRun: timeNow,
@@ -42,7 +42,7 @@ let taskInProgress = false;
         toDo: tasks._getHashtags,
         publicKey: 0,
     }
-    _queue(getHashtags, 'add');
+    //_queue(getHashtags, 'add');
     //push get Gas Price to the queue
     const getGasPrice = {
         nextRun: timeNow,
@@ -50,7 +50,7 @@ let taskInProgress = false;
         toDo: tasks._getGasPrice,
         publicKey: 0,
     }
-    _queue(getGasPrice, 'add');
+    //_queue(getGasPrice, 'add');
     //push get Health to the queue
     const getHealth = {
         nextRun: timeNow,
@@ -58,7 +58,7 @@ let taskInProgress = false;
         toDo: tasks._getHealth,
         publicKey: 0,
     }
-    _queue(getHealth, 'add');
+    //_queue(getHealth, 'add');
     // start the queue manager
     _queueManager();
     _blockWatcher();
@@ -83,7 +83,15 @@ io.on('connection', function (socket) {
         toDo: tasks._getPendingTransaction,
         publicKey: user.publicKey,
     }
-    _queue(getBalance, 'add');
+    const getFx = {
+        nextRun: 0,
+        interval: 0,
+        toDo: tasks._getFx,
+        publicKey: 0,
+        socket: socket
+    }
+    //_queue(getBalance, 'add');
+    //_queue(getFx, 'add');
     /**
      * Disconnect
      */
@@ -173,7 +181,16 @@ function _blockWatcher() {
                     publicKey: data.publicKey,
                     socket: data.socket
                 }
-                _queue(getBalance, 'add');
+                //_queue(getBalance, 'add');
+
+                const getFx = {
+                    nextRun: 0,
+                    interval: 0,
+                    toDo: tasks._getFx,
+                    publicKey: data.publicKey,
+                    socket: data.socket
+                }
+                _queue(getFx, 'add');
             });
         } else {
             logs._errorLog('_blockWatcher', 'unhandled subscription error')
