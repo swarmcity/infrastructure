@@ -4,6 +4,7 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
+const tasks = require('./tasks.js');
 
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
@@ -14,7 +15,6 @@ let connected = [];
 let queue = [];
 let processing = [];
 let taskInProgress = false;
-
 
 // Implemented from...  https://github.com/swarmcity/sc-protocol-docs/issues/20
 
@@ -28,7 +28,7 @@ let taskInProgress = false;
     const getFx = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: _getFx,
+        toDo: tasks._getFx,
         publicKey: 0,
     }
     _queue(getFx, 'add');
@@ -36,7 +36,7 @@ let taskInProgress = false;
     const getHashtags = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: _getHashtags,
+        toDo: tasks._getHashtags,
         publicKey: 0,
     }
     _queue(getHashtags, 'add');
@@ -44,7 +44,7 @@ let taskInProgress = false;
     const getGasPrice = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: _getGasPrice,
+        toDo: tasks._getGasPrice,
         publicKey: 0,
     }
     _queue(getGasPrice, 'add');
@@ -52,7 +52,7 @@ let taskInProgress = false;
     const getHealth = {
         nextRun: timeNow,
         interval: 300000,
-        toDo: _getHealth,
+        toDo: tasks._getHealth,
         publicKey: 0,
     }
     _queue(getHealth, 'add');
@@ -116,7 +116,7 @@ io.on('connection', function (socket) {
     });
 });
 
-/** 
+/**
 * the queue will need add, remove and return, not update!
 * direction is 'add' or 'remove'
 * if the direction is remove then a public key and toDo must be provided
@@ -126,7 +126,7 @@ function _queue(task, direction) {
     if(task && direction == 'add'){
         var isDuplicate = queue.filter(function(obj) {
             return (obj.publicKey == task.publicKey && obj.toDo == task.toDo);
-        }); 
+        });
         if(isDuplicate.length == 0){
             queue.push(task);
         }
@@ -141,21 +141,21 @@ function _queue(task, direction) {
     }
 }
 
-/** 
+/**
 * Each second filter the queue for tasks that need tobe done and pass them to the task schedulree
 */
 function _queueManager() {
     console.log('queueManager')
-    setInterval(() => { 
+    setInterval(() => {
         const timeNow = (new Date).getTime();
         let tasksToDo = queue.filter(function(obj) {
             return (obj.nextRun <= timeNow);
         });
-        _taskSheduler(tasksToDo);
+        _taskScheduler(tasksToDo);
     }, 1000);
 }
 
-/** 
+/**
 * Watch the blockchain for a new block
 */
 function _blockWatcher() {
@@ -176,14 +176,14 @@ function _blockWatcher() {
     })
 }
 
-/** 
+/**
 * Inserts jobs into the job schedular array as they arrive
 * he scheduled jobs are processed as fast as possible, one after another
 * Once a job has been completed its removed from the queue or rescheduled
 */
 
-function _taskSheduler(tasks){
-    if(taskInProgress == false){   
+function _taskScheduler(tasks){
+    if(taskInProgress == false){
         taskInProgress = true;
         return tasks.reduce((chain, task) => {
             return chain.then(() => task.toDo(task))
@@ -191,47 +191,6 @@ function _taskSheduler(tasks){
         }, Promise.resolve());
     }
 }
-
-    /**
-    * Tasks
-    */
-    function _getFx(data){
-        return new Promise((resolve, reject) => {
-            console.log('=========== GET FX ============');
-            resolve('getFx');
-        })
-    }
-
-    function _getHashtags(task){
-        return new Promise((resolve, reject) => {
-            console.log('=========== GET HASHTAGS ============');
-            resolve('getFx');
-        })
-    };
-    function _getGasPrice(task){
-        return new Promise((resolve, reject) => {
-            console.log('=========== GET GAS PRICE ============');
-            resolve('getFx');
-        })
-    };
-    function _getHealth(task){
-        return new Promise((resolve, reject) => {
-            console.log('=========== GET HEALTH ============');
-            resolve('getFx');
-        })
-    };
-
-    function _getPendingTransactions(task){
-        return new Promise((resolve, reject) => {
-            resolve('getFx');
-        })
-    };
-
-    function _getBalance(task){
-        return new Promise((resolve, reject) => {
-            resolve('getFx');
-        })
-    };
 
 /**
 * Logs
