@@ -5,9 +5,6 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 
-// get the task functions
-require('tasks.js')();
-
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
 
@@ -98,23 +95,23 @@ io.on('connection', function (socket) {
      * One Time Requests
      */
     socket.on('requests', (data, response) => {
-        console.log('requests', data);
+        //console.log('requests', data);
         response({status: 200});
     });
     socket.on('broadcastTransaction', (data, response) => {
-        console.log('broadcastTransaction', data);
+        //console.log('broadcastTransaction', data);
         response({status: 200});
     });
     socket.on('saveAvatar', (data, response) => {
-        console.log('saveAvatar', data);
+        //console.log('saveAvatar', data);
         response({status: 200});
     });
     socket.on('getNoonce', (data, response) => {
-        console.log('getNoonce', data);
+        //console.log('getNoonce', data);
         response({status: 200});
     });
     socket.on('saveError', (data, response) => {
-        console.log('saveError', data);
+        //console.log('saveError', data);
         response({status: 200});
     });
 });
@@ -185,28 +182,64 @@ function _blockWatcher() {
 * Once a job has been completed its removed from the queue or rescheduled
 */
 
-function _taskSheduler(actions){
-    console.log(actions)
-    return actions.reduce((chain, action) => {
-        return chain.then(() => action.toDo(action))
-        .then(val => console.log(val));
-    }, Promise.resolve());
+function _taskSheduler(tasks){
+    if(taskInProgress == false){   
+        taskInProgress = true;
+        return tasks.reduce((chain, task) => {
+            return chain.then(() => task.toDo(task))
+            .then(val => console.log(val));
+        }, Promise.resolve());
+    }
 }
 
+    /**
+    * Tasks
+    */
+    function _getFx(data){
+        return new Promise((resolve, reject) => {
+            console.log('=========== GET FX ============');
+            resolve('getFx');
+        })
+    }
 
+    function _getHashtags(task){
+        return new Promise((resolve, reject) => {
+            console.log('=========== GET HASHTAGS ============');
+            resolve('getFx');
+        })
+    };
+    function _getGasPrice(task){
+        return new Promise((resolve, reject) => {
+            console.log('=========== GET GAS PRICE ============');
+            resolve('getFx');
+        })
+    };
+    function _getHealth(task){
+        return new Promise((resolve, reject) => {
+            console.log('=========== GET HEALTH ============');
+            resolve('getFx');
+        })
+    };
+
+    function _getPendingTransactions(task){
+        return new Promise((resolve, reject) => {
+            resolve('getFx');
+        })
+    };
+
+    function _getBalance(task){
+        return new Promise((resolve, reject) => {
+            resolve('getFx');
+        })
+    };
 
 /**
 * Logs
 */
 function _eventLog(item, type) {
-    //console.log(item, type)
-    // start checking for a new block
-    // if you find a new block get the balance for each connected user
 }
+
 function _errorLog(item, type) {
-    console.log(item, type)
-    // start checking for a new block
-    // if you find a new block get the balance for each connected user
 }
 
 const PORT = 8011;
