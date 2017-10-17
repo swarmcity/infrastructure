@@ -1,67 +1,66 @@
-getBalance(address, token) {
-    return new Promise((resolve, reject) => {
-        resolve(this._getBalance(address, token, 'main', 1));
-    });
-}
+module.exports = function(web3) {
 
+return ({
 /**
- * Get Balance.
- * @param {String} address
- * @param {int} network index
- * @param {int} provider index
- * @return {BigNumber} swtBalance amount of tokens held at address
+ * Get Balance
+ * @param {String} address - The user's pub key
+ * @param {Array} tokens - The tokens to be fetched
+ * @return {Array} - Balances of that user
  */
-_getBalance(address, contractName, network, provider) {
-    return new Promise((resolve, reject) => {
-        Promise.all(
-            [this._loadAbi(contractName),
-                this._loadAddress(contractName),
-                this._loadProviders()]
-        ).then((data) => {
-            // constructing contract from abi/address should happen globally
-            const abiArray = data[0].abi;
-            const contractAddress = data[1][contractName];
-            const providers = data[2]['ropsten'];
-            let web3 = new dragon.Web3();
-            web3.setProvider(
-                new web3.providers.HttpProvider(providers[provider]));
-            let contract = web3.eth.contract(abiArray)
-                .at(contractAddress);
-            contract.getBalance(address, function(error, response) {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(response);
-                }
-            });
-        })
-            .catch((err) => {
-                reject(err);
-            });
+
+ /**
+ * Represents a users balance
+ * @response
+ * @param {number} response - The HTTP response code
+ * @param {array} balances - An array of tokens and their balance
+ * @param {string} pubkey - A public key (0x...)
+ * @param {array} data - an array of balance objects
+ * @param {string} tokenSymbol - The token's short name
+ * @param {string} tokenName - The token's long name ('Swarm City Token', 'NeedARide', 'Ether')
+ * @param {string} tokenContractAddress - A token address (0x...)
+ * @param {string} balance - in wei or smallest erc20
+ * @param {string} subscription - the socket connection id
+ * @param {number} nonce - nonce
+ */
+
+_getBalance: function(address) {
+
+  return new Promise((resolve, reject) => {
+    // Iterate over the tokens
+    var promisesList = [];
+    var minimeContract = require('../contracts/MiniMeToken.json');
+    var tokens = ["SWT", "ARC"];
+    var tokenIndex = require('../contracts/index.json');
+
+    tokens.forEach((token) => {
+      var tokenContract = new web3.eth.Contract(minimeContract.abi, tokenIndex[token]);
+      promisesList.push(tokenContract.methods.balanceOf(address).call().then((res) => {
+        return {  token: token,
+                  balance: res
+              };
+      }));
     });
-}
+
+    resolve(Promise.all(promisesList));
+  });
+},
 
 /**
 * Returns the abi for the requests contract
 * @param {string} contractName is the name of the contract
-* @return {abi} abiu repreents the contracts abi
+* @return {abi} abi repreents the contract's abi
 */
-_loadAbi(contractName) {
+
+_loadAbi: function(contractName) {
     return new Promise((resolve, reject) => {
-        const xobj = new XMLHttpRequest();
-        const path = '../base/src/contracts/' + contractName + '.json';
-        xobj.overrideMimeType('application/json');
-        xobj.open('GET', path, true);
-        xobj.onreadystatechange = () => {
-            if (xobj.readyState == 4 && xobj.status == '200') {
-                const json = JSON.parse(xobj.responseText);
-                resolve(json);
-            }
-        };
-        // Request the json
-        xobj.send(null);
+        fs.readFile('../base/src/contracts/' + contractName + '.json', (err, data) => {
+          if (err) throw err;
+          console.log(data);
+          const json = JSON.parse(data);
+          resolve(json);
+        });
     });
-}
+},
 
 /**
 * Returns the contract address
@@ -69,7 +68,7 @@ _loadAbi(contractName) {
 * @return {string} contractAddress repreents the
 * contracts address on main-net
 */
-_loadAddress(contractName) {
+_loadAddress: function(contractName) {
     return new Promise((resolve, reject) => {
         const xobj = new XMLHttpRequest();
         const path = '../base/src/contracts/index.json';
@@ -86,24 +85,6 @@ _loadAddress(contractName) {
     });
 }
 
- /**
- * Returns the web3 providers
- * @param {string} network limit to a network
- * @return {array} providers
- */
-_loadProviders() {
-    return new Promise((resolve, reject) => {
-        const xobj = new XMLHttpRequest();
-        const path = '../base/src/contracts/providers.json';
-        xobj.overrideMimeType('application/json');
-        xobj.open('GET', path, true);
-        xobj.onreadystatechange = () => {
-            if (xobj.readyState == 4 && xobj.status == '200') {
-                const json = JSON.parse(xobj.responseText);
-                resolve(json['web3']);
-            }
-        };
-        // Request the json
-        xobj.send(null);
-    });
+});
+
 }

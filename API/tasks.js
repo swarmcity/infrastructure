@@ -1,48 +1,61 @@
-module.exports = function(logs) { return {
-/**
-* Tasks
-*/
-_getFx: function(data){
-    return new Promise((resolve, reject) => {
-        console.log('=========== GET FX ============');
-        logs._eventLog('test', 'hi there');
-        resolve('getFx');
-    })
-},
+const logs = require('./logs.js')();
 
-_getHashtags: function(task){
-    return new Promise((resolve, reject) => {
-        console.log('=========== GET HASHTAGS ============');
-        resolve('getFx');
-    })
-},
+module.exports = function(web3){
 
-_getGasPrice: function(task){
-    return new Promise((resolve, reject) => {
-        console.log('=========== GET GAS PRICE ============');
-        resolve('getFx');
-    })
-},
+const getBalance = require('./tasks/getBalance.js')(web3);
 
-_getHealth: function(task){
-    return new Promise((resolve, reject) => {
-        console.log('=========== GET HEALTH ============');
-        resolve('getFx');
-    })
-},
+return {
 
-_getPendingTransactions: function(task){
+  /**
+  * Tasks
+  */
+  _getFx: function(data){
     return new Promise((resolve, reject) => {
-        resolve('getFx');
+      console.log('=========== GET FX ============');
+      // conversion to xx coinmarket cap API
+      logs._eventLog('test', 'hi there');
+      resolve('getFx');
     })
-},
+  },
 
-_getBalance: function(task){
+  _getHashtags: function(queue, task){
     return new Promise((resolve, reject) => {
-        resolve('getFx');
+      // dummy hashtagslist
+      console.log('=========== GET HASHTAGS ============');
+      resolve('getFx');
     })
+  },
+
+  _getGasPrice: function(queue, task){
+    return new Promise((resolve, reject) => {
+      // get gas price
+      console.log('=========== GET GAS PRICE ============');
+      resolve('getFx');
+    })
+  },
+
+  _getHealth: function(queue, task){
+    return new Promise((resolve, reject) => {
+      console.log('=========== GET HEALTH ============');
+      resolve('getFx');
+    })
+  },
+
+  _getPendingTransactions: function(queue, task){
+    return new Promise((resolve, reject) => {
+      // get pending tx
+      resolve('getFx');
+    })
+  },
+
+  _getBalance: function(queue, task){
+    return getBalance._getBalance(task.publicKey).then((res) => {
+      task.socket.emit('balanceChanged', res);
+      queue(task, "remove");
+      return res;
+    }).catch((err) => { console.log('get balance ERR! ', err)});
+  }
+
 }
 
-}
-
-}
+};

@@ -4,14 +4,16 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
-const logs = require('./logs.js')();
-const tasks = require('./tasks.js')(logs);
 
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
 
-// install fs and save logs to txt file
 
+const logs = require('./logs.js')();
+const tasks = require('./tasks.js')(web3);
+
+
+// install fs and save logs to txt file
 let connected = [];
 let queue = [];
 let processing = [];
@@ -66,18 +68,19 @@ let taskInProgress = false;
  * Connect
  */
 io.on('connection', function (socket) {
-    const user = {socketId: socket.id, publicKey: socket.handshake.query.publicKey};
+    const user = {socketId: socket.id, publicKey: socket.handshake.query.publicKey, socket: socket };
     connected.push(user);
     const getBalance = {
         nextRun: 0,
         interval: 0,
-        toDo: _getBalance,
+        toDo: tasks._getBalance,
         publicKey: user.publicKey,
+        socket : socket
     }
     const getPendingTransactions = {
         nextRun: 0,
         interval: 0,
-        toDo: _getPendingTransaction,
+        toDo: tasks._getPendingTransaction,
         publicKey: user.publicKey,
     }
     _queue(getBalance, 'add');
@@ -143,7 +146,7 @@ function _queue(task, direction) {
 }
 
 /**
-* Each second filter the queue for tasks that need tobe done and pass them to the task schedulree
+* Each second filter the queue for tasks that need tobe done and pass them to the task schedule
 */
 function _queueManager() {
     console.log('queueManager')
@@ -153,7 +156,7 @@ function _queueManager() {
             return (obj.nextRun <= timeNow);
         });
         _taskScheduler(tasksToDo);
-    }, 1000);
+    }, 5000);
 }
 
 /**
@@ -166,28 +169,29 @@ function _blockWatcher() {
                 const getBalance = {
                     nextRun: 0,
                     interval: 0,
-                    toDo: _getBalance,
+                    toDo: tasks._getBalance,
                     publicKey: data.publicKey,
+                    socket: data.socket
                 }
                 _queue(getBalance, 'add');
             });
         } else {
-            _errorLog('_blockWatcher', 'unhandled subscription error')
+            logs._errorLog('_blockWatcher', 'unhandled subscription error')
         }
     })
 }
 
 /**
-* Inserts jobs into the job schedular array as they arrive
+* Inserts jobs into the job scheduler array as they arrive
 * he scheduled jobs are processed as fast as possible, one after another
 * Once a job has been completed its removed from the queue or rescheduled
 */
 
-function _taskScheduler(tasks){
+function _taskScheduler(taskList){
     if(taskInProgress == false){
         taskInProgress = true;
-        return tasks.reduce((chain, task) => {
-            return chain.then(() => task.toDo(task))
+        return taskList.reduce((chain, task) => {
+            return chain.then(() => task.toDo(_queue, task))
             .then(val => console.log(val, Date.now()));
         }, Promise.resolve()).then(() => { taskInProgress = false }).catch(() => { taskInProgress = false });
     }
