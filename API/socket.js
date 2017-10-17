@@ -90,8 +90,8 @@ io.on('connection', function (socket) {
         publicKey: 0,
         socket: socket
     }
-    //_queue(getBalance, 'add');
-    //_queue(getFx, 'add');
+    _queue(getBalance, 'add');
+    _queue(getFx, 'add');
     /**
      * Disconnect
      */
@@ -190,7 +190,7 @@ function _blockWatcher() {
                     publicKey: data.publicKey,
                     socket: data.socket
                 }
-                _queue(getFx, 'add');
+                //_queue(getFx, 'add');
             });
         } else {
             logs._errorLog('_blockWatcher', 'unhandled subscription error')

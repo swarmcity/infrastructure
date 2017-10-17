@@ -12,9 +12,8 @@ return {
   */
   _getFx: function(queue, task){
     return getFx._getFx(task.publicKey).then((res) => {
-      console.log("----_SHOULD EMIT _-----", a++);
       task.socket.emit('fxChanged', res);
-      //queue(task, "remove");
+      queue(task, "remove");
       return res;
     }).catch((err) => { console.log('get fx ERR! ', err)});
   },
