@@ -5,7 +5,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 const logs = require('./logs.js')();
-const tasks = require('./tasks.js')(logs._eventLog);
+const tasks = require('./tasks.js')(logs);
 
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
@@ -192,7 +192,6 @@ function _taskScheduler(tasks){
         }, Promise.resolve());
     }
 }
-
 
 const PORT = 8011;
 const HOST = '0.0.0.0';

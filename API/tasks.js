@@ -1,11 +1,11 @@
-module.exports = function(_eventLog) { return {
+module.exports = function(logs) { return {
 /**
 * Tasks
 */
 _getFx: function(data){
     return new Promise((resolve, reject) => {
         console.log('=========== GET FX ============');
-        _eventLog('test', 'hi there');
+        logs._eventLog('test', 'hi there');
         resolve('getFx');
     })
 },
