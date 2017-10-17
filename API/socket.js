@@ -189,7 +189,7 @@ function _taskScheduler(tasks){
         return tasks.reduce((chain, task) => {
             return chain.then(() => task.toDo(task))
             .then(val => console.log(val, Date.now()));
-        }, Promise.resolve()).then(() => { taskInProgress = false });
+        }, Promise.resolve()).then(() => { taskInProgress = false }).catch(() => { taskInProgress = false });
     }
 }
 
