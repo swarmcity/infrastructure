@@ -4,7 +4,7 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
-const tasks = require('./tasks.js');
+const tasks = require('./tasks.js')(_eventLog);
 
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
@@ -196,6 +196,7 @@ function _taskScheduler(tasks){
 * Logs
 */
 function _eventLog(item, type) {
+  console.log(item, type);
 }
 
 function _errorLog(item, type) {
