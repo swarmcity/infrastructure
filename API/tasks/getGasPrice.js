@@ -1,3 +1,5 @@
+const logs = require('../logs.js')();
+
 module.exports = function(web3) {
 
 	return ({
@@ -6,7 +8,7 @@ module.exports = function(web3) {
 
 			return new Promise((resolve, reject) => {
 				web3.eth.getGasPrice().then((gasPrice) => {
-					console.log('GasPrice: ', gasPrice.toString(10));
+					logs._eventLog('GasPrice: ', gasPrice.toString(10));
 					resolve(gasPrice.toString(10));
 				});
 			});

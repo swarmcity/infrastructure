@@ -1,3 +1,5 @@
+const logs = require('../logs.js')();
+
 module.exports = function(web3) {
 
 	return ({
@@ -74,7 +76,7 @@ module.exports = function(web3) {
 		;
 
 			return new Promise((resolve, reject) => {
-				console.log('HashtagsItems: ', returnObject);
+				logs._eventLog('HashtagsItems: ', returnObject);
 				resolve(returnObject);
 			});
 		}

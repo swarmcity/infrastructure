@@ -1,3 +1,5 @@
+const logs = require('../logs.js')();
+
 module.exports = function(web3) {
 
 	return ({
@@ -17,7 +19,7 @@ module.exports = function(web3) {
 			}];
 
 			return new Promise((resolve, reject) => {
-				console.log('Hashtags: ', hashtags);
+				logs._eventLog('Hashtags: ', hashtags);
 				resolve(hashtags);
 			});
 		}
