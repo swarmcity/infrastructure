@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux-state.html">
 
 <dom-module id="get-balance">
     <template>
@@ -36,7 +37,7 @@
     </template>
     <script>
 
-        class GetBalance extends Polymer.Element {
+        class GetBalance extends new ReduxMixin(Polymer.Element) {
 
             static get is() {
                 return 'get-balance';
@@ -49,16 +50,10 @@
                     */
                     balance: {
                         type: Array,
+                        statePath: 'balance',
                     },
                 };
             }
-
-        ready() {
-            super.ready();
-            socket.on('balanceChanged', (data) => {
-                this.balance = data;
-            });
-        }
         
         } window.customElements.define(GetBalance.is, GetBalance);
     </script>

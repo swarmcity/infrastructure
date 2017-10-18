@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="my-icons.html">
 
 <link rel="import" href="redux-state.html">
+<link rel="import" href="components/socket-redux.html">
 
 <link rel="lazy-import" href="my-create-wallet.html">
 <link rel="lazy-import" href="my-restore-wallet.html">
@@ -81,6 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <socket-redux></socket-redux>
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
     <app-route
         route="{{route}}"
@@ -147,7 +149,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
-    class MyApp extends Polymer.Element {
+    class MyApp extends new ReduxMixin(Polymer.Element) {
       static get is() { return 'my-app'; }
 
       static get properties() {

@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux-state.html">
 
 <dom-module id="get-fx">
     <template>
@@ -33,7 +34,7 @@
     </template>
     <script>
 
-        class GetFx extends Polymer.Element {
+        class GetFx extends new ReduxMixin(Polymer.Element) {
 
             static get is() {
                 return 'get-fx';
@@ -46,16 +47,10 @@
                     */
                     fx: {
                         type: Array,
+                        statePath: 'fx',
                     },
                 };
             }
-
-        ready() {
-            super.ready();
-            socket.on('fxChanged', (data) => {
-                this.fx = data[0];
-            });
-        }
         
         } window.customElements.define(GetFx.is, GetFx);
     </script>

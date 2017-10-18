@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux-state.html">
 
 <dom-module id="get-hashtags">
     <template>
@@ -35,8 +36,7 @@
     </template>
     <script>
 
-        class GetHashtags extends Polymer.Element {
-
+        class GetHashtags extends new ReduxMixin(Polymer.Element) {
             static get is() {
                 return 'get-hashtags';
             }
@@ -48,16 +48,10 @@
                     */
                     hashtags: {
                         type: Array,
+                        statePath: 'hashtags',
                     },
                 };
             }
-
-        ready() {
-            super.ready();
-            socket.on('hashtagsChanged', (data) => {
-                this.hashtags = data;
-            });
-        }
         
         } window.customElements.define(GetHashtags.is, GetHashtags);
     </script>
