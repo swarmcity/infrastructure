@@ -11,6 +11,7 @@ const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
+const getHashtagItems = require('./tasks/getHashtagItems.js')(web3);
 
 
 // install fs and save logs to txt file
@@ -151,6 +152,18 @@ io.on('connection', function(socket) {
           console.log('newItem ERR! ', err)
         });
     });
+
+    socket.on('hashtagItems', (data, response) => {
+        console.log('hashtagItems', data);
+        // Make promise, store deal and return txhash
+        return getHashtagItems._getHashtagItems(data).then((res) => {
+          socket.emit('hashtagItemsChanged', res);
+          response({ status: 200, res});
+        }).catch((err) => {
+          console.log('hashtagItems ERR! ', err)
+        });
+    });
+
     socket.on('broadcastTransaction', (data, response) => {
         //console.log('broadcastTransaction', data);
         response({
@@ -213,7 +226,7 @@ function _queueManager() {
             return (obj.nextRun <= timeNow);
         });
         _taskScheduler(tasksToDo);
-    }, 5000);
+    }, 1000);
 }
 
 /**
