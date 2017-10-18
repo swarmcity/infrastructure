@@ -98,7 +98,7 @@ io.on('connection', function(socket) {
 		interval: 0,
 		toDo: tasks._getFx,
 		publicKey: 0,
-        socket: socket
+    socket: socket
 	};
 
 	_queue(getHashtags, 'add');
@@ -256,7 +256,8 @@ function _taskScheduler(taskList) {
 		}, Promise.resolve()).then(() => {
 			taskInProgress = false
 		}).catch(() => {
-			taskInProgress = false
+			taskInProgress = false;
+      logs._errorLog('_taskScheduler', 'unhandled error')
 		});
 	}
 }
