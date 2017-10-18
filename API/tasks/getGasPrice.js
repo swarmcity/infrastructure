@@ -1,18 +1,18 @@
 module.exports = function(web3) {
 
-return ({
+	return ({
 
-_getGasPrice: function(address) {
+		_getGasPrice: function(address) {
 
-  return new Promise((resolve, reject) => {
-    var gasPrice = web3.eth.getGasPrice().then((gasPrice) => {
-      console.log('GasPrice: ', gasPrice.toString(10)); // "10000000000000"
-      resolve(gasPrice.toString(10));
-    });
-  });
-}
+			return new Promise((resolve, reject) => {
+				web3.eth.getGasPrice().then((gasPrice) => {
+					console.log('GasPrice: ', gasPrice.toString(10));
+					resolve(gasPrice.toString(10));
+				});
+			});
 
+		}
 
-});
+	});
 
 }

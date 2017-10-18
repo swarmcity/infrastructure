@@ -24,42 +24,42 @@ let taskInProgress = false;
 /**
  * Start
  */
-(function(){
+(function() {
     // get time in miliseconds
     const timeNow = (new Date).getTime();
     //push get FX to the queue
     const getFx = {
-        nextRun: timeNow,
-        interval: 300000,
-        toDo: tasks._getFx,
-        publicKey: 0,
-    }
-    //_queue(getFx, 'add');
-    //push get Hashtags to the queue
+            nextRun: timeNow,
+            interval: 300000,
+            toDo: tasks._getFx,
+            publicKey: 0,
+        }
+        //_queue(getFx, 'add');
+        //push get Hashtags to the queue
     const getHashtags = {
-        nextRun: timeNow,
-        interval: 300000,
-        toDo: tasks._getHashtags,
-        publicKey: 0,
-    }
-    //_queue(getHashtags, 'add');
-    //push get Gas Price to the queue
+            nextRun: timeNow,
+            interval: 300000,
+            toDo: tasks._getHashtags,
+            publicKey: 0,
+        }
+        //_queue(getHashtags, 'add');
+        //push get Gas Price to the queue
     const getGasPrice = {
-        nextRun: timeNow,
-        interval: 300000,
-        toDo: tasks._getGasPrice,
-        publicKey: 0,
-    }
-    //_queue(getGasPrice, 'add');
-    //push get Health to the queue
+            nextRun: timeNow,
+            interval: 300000,
+            toDo: tasks._getGasPrice,
+            publicKey: 0,
+        }
+        //_queue(getGasPrice, 'add');
+        //push get Health to the queue
     const getHealth = {
-        nextRun: timeNow,
-        interval: 300000,
-        toDo: tasks._getHealth,
-        publicKey: 0,
-    }
-    //_queue(getHealth, 'add');
-    // start the queue manager
+            nextRun: timeNow,
+            interval: 300000,
+            toDo: tasks._getHealth,
+            publicKey: 0,
+        }
+        //_queue(getHealth, 'add');
+        // start the queue manager
     _queueManager();
     _blockWatcher();
 })();
@@ -67,15 +67,27 @@ let taskInProgress = false;
 /**
  * Connect
  */
-io.on('connection', function (socket) {
-    const user = {socketId: socket.id, publicKey: socket.handshake.query.publicKey, socket: socket };
+io.on('connection', function(socket) {
+
+    // the client should provide a publicKey argument
+    // if not - just diconnect
+    if (!socket.handshake.query.publicKey) {
+        console.log('no pubkey given.');
+        return socket.disconnect(true);
+    }
+
+    const user = {
+        socketId: socket.id,
+        publicKey: socket.handshake.query.publicKey,
+        socket: socket
+    };
     connected.push(user);
     const getBalance = {
         nextRun: 0,
         interval: 0,
         toDo: tasks._getBalance,
         publicKey: user.publicKey,
-        socket : socket
+        socket: socket
     }
     const getPendingTransactions = {
         nextRun: 0,
@@ -84,13 +96,13 @@ io.on('connection', function (socket) {
         publicKey: user.publicKey,
     }
     const getFx = {
-        nextRun: 0,
-        interval: 0,
-        toDo: tasks._getFx,
-        publicKey: 0,
-        socket: socket
-    }
-    //push get Gas Price to the queue
+            nextRun: 0,
+            interval: 0,
+            toDo: tasks._getFx,
+            publicKey: 0,
+            socket: socket
+        }
+        //push get Gas Price to the queue
     const getGasPrice = {
         nextRun: 0,
         interval: 0,
@@ -125,42 +137,52 @@ io.on('connection', function (socket) {
      */
     socket.on('requests', (data, response) => {
         //console.log('requests', data);
-        response({status: 200});
+        response({
+            status: 200
+        });
     });
     socket.on('broadcastTransaction', (data, response) => {
         //console.log('broadcastTransaction', data);
-        response({status: 200});
+        response({
+            status: 200
+        });
     });
     socket.on('saveAvatar', (data, response) => {
         //console.log('saveAvatar', data);
-        response({status: 200});
+        response({
+            status: 200
+        });
     });
     socket.on('getNoonce', (data, response) => {
         //console.log('getNoonce', data);
-        response({status: 200});
+        response({
+            status: 200
+        });
     });
     socket.on('saveError', (data, response) => {
         //console.log('saveError', data);
-        response({status: 200});
+        response({
+            status: 200
+        });
     });
 });
 
 /**
-* the queue will need add, remove and return, not update!
-* direction is 'add' or 'remove'
-* if the direction is remove then a public key and toDo must be provided
-* ensure the queue does not have duplicates
-*/
+ * the queue will need add, remove and return, not update!
+ * direction is 'add' or 'remove'
+ * if the direction is remove then a public key and toDo must be provided
+ * ensure the queue does not have duplicates
+ */
 function _queue(task, direction) {
-    if(task && direction == 'add'){
+    if (task && direction == 'add') {
         var isDuplicate = queue.filter(function(obj) {
             return (obj.publicKey == task.publicKey && obj.toDo == task.toDo);
         });
-        if(isDuplicate.length == 0){
+        if (isDuplicate.length == 0) {
             queue.push(task);
         }
         logs._eventLog(task, 'add to queue');
-    } else if (task && direction == 'remove'){
+    } else if (task && direction == 'remove') {
         queue = queue.filter(function(obj) {
             return (obj.publicKey != task.publicKey || obj.toDo != task.toDo); // Double santiy check this the "||"" feels wrong, but works!!
         });
@@ -171,8 +193,8 @@ function _queue(task, direction) {
 }
 
 /**
-* Each second filter the queue for tasks that need tobe done and pass them to the task schedule
-*/
+ * Each second filter the queue for tasks that need tobe done and pass them to the task schedule
+ */
 function _queueManager() {
     console.log('queueManager')
     setInterval(() => {
@@ -185,29 +207,29 @@ function _queueManager() {
 }
 
 /**
-* Watch the blockchain for a new block
-*/
+ * Watch the blockchain for a new block
+ */
 function _blockWatcher() {
-    var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result){
-        if (!error){
-            connected.forEach(function(data){
+    var subscription = web3.eth.subscribe('newBlockHeaders', function(error, result) {
+        if (!error) {
+            connected.forEach(function(data) {
                 const getBalance = {
-                    nextRun: 0,
-                    interval: 0,
-                    toDo: tasks._getBalance,
-                    publicKey: data.publicKey,
-                    socket: data.socket
-                }
-                //_queue(getBalance, 'add');
+                        nextRun: 0,
+                        interval: 0,
+                        toDo: tasks._getBalance,
+                        publicKey: data.publicKey,
+                        socket: data.socket
+                    }
+                    //_queue(getBalance, 'add');
 
                 const getFx = {
-                    nextRun: 0,
-                    interval: 0,
-                    toDo: tasks._getFx,
-                    publicKey: data.publicKey,
-                    socket: data.socket
-                }
-                //_queue(getFx, 'add');
+                        nextRun: 0,
+                        interval: 0,
+                        toDo: tasks._getFx,
+                        publicKey: data.publicKey,
+                        socket: data.socket
+                    }
+                    //_queue(getFx, 'add');
             });
         } else {
             logs._errorLog('_blockWatcher', 'unhandled subscription error')
@@ -216,18 +238,22 @@ function _blockWatcher() {
 }
 
 /**
-* Inserts jobs into the job scheduler array as they arrive
-* he scheduled jobs are processed as fast as possible, one after another
-* Once a job has been completed its removed from the queue or rescheduled
-*/
+ * Inserts jobs into the job scheduler array as they arrive
+ * he scheduled jobs are processed as fast as possible, one after another
+ * Once a job has been completed its removed from the queue or rescheduled
+ */
 
-function _taskScheduler(taskList){
-    if(taskInProgress == false){
+function _taskScheduler(taskList) {
+    if (taskInProgress == false) {
         taskInProgress = true;
         return taskList.reduce((chain, task) => {
             return chain.then(() => task.toDo(_queue, task))
-            .then(val => console.log(val, Date.now()));
-        }, Promise.resolve()).then(() => { taskInProgress = false }).catch(() => { taskInProgress = false });
+                .then(val => console.log(val, Date.now()));
+        }, Promise.resolve()).then(() => {
+            taskInProgress = false
+        }).catch(() => {
+            taskInProgress = false
+        });
     }
 }
 
