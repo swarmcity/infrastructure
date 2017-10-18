@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/get-fx.html">
+
+<dom-module id="my-get-fx">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <get-fx></get-fx>
+    </div>
+  </template>
+
+  <script>
+    class MyGetFx extends Polymer.Element {
+        static get is() { return 'my-get-fx'; }
+
+    } window.customElements.define(MyGetFx.is, MyGetFx);
+  </script>
+</dom-module>

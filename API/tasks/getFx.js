@@ -23,7 +23,7 @@ _getFx: function(address) {
 
         });
     }).on('error', function(e){
-          console.log("Got an error: ", e);
+        console.log("Got an error: ", e);
     });
 
   });

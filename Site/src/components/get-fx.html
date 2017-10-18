@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="get-fx">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+
+        <div class="container">
+            <h1>FX</h1>
+            <p><b>The latest fx rates are:</b></p>
+            <hr>
+        </div>
+
+        <div>Symbol: {{fx.symbol}}</div>
+        <div>Bitcoin: {{fx.price_btc}}</div>
+        <div>Euros : {{fx.price_eur}}</div>
+        <div>USD: {{fx.price_usd}}</div>
+
+    </template>
+    <script>
+
+        class GetFx extends Polymer.Element {
+
+            static get is() {
+                return 'get-fx';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * hashtags represents the list of hashtags
+                    * @type {Object}
+                    */
+                    fx: {
+                        type: Array,
+                    },
+                };
+            }
+
+        ready() {
+            super.ready();
+            socket.on('fxChanged', (data) => {
+                this.fx = data[0];
+            });
+        }
+        
+        } window.customElements.define(GetFx.is, GetFx);
+    </script>
+</dom-module>
+

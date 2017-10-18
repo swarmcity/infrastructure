@@ -13,6 +13,9 @@
     "src/my-translation-available.html",
     "src/my-default-language.html",
     "src/my-old-wallet.html",
+    "src/my-get-hashtags.html",
+    "src/my-get-balance.html",
+    "src/my-get-fx.html",
     "src/my-view404.html"
   ],
   "sources": [
@@ -23,6 +26,7 @@
   "extraDependencies": [
     "manifest.json",
     "bower_components/webcomponentsjs/*.js",
+    "node_modules/redux/dist/redux.min.js",
     "socket.io.js"
   ],
   "lint": {

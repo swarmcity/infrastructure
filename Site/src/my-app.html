@@ -22,6 +22,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
 
+<link rel="import" href="redux-state.html">
+
 <link rel="lazy-import" href="my-create-wallet.html">
 <link rel="lazy-import" href="my-restore-wallet.html">
 <link rel="lazy-import" href="my-sign-message.html">
@@ -33,6 +35,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="my-default-language.html">
 <link rel="lazy-import" href="my-translation-available.html">
 <link rel="lazy-import" href="my-old-wallet.html">
+<link rel="lazy-import" href="my-get-hashtags.html">
+<link rel="lazy-import" href="my-get-balance.html">
+<link rel="lazy-import" href="my-get-fx.html">
 <link rel="lazy-import" href="my-view404.html">
 
 <dom-module id="my-app">
@@ -99,8 +104,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <a name="resize-avatar" href="[[rootPath]]resize-avatar">Resize Avatar</a>
           <a name="get-geohash" href="[[rootPath]]get-geohash">Get Geohash</a>
           <a name="geohash-distance" href="[[rootPath]]geohash-distance">Geohash Distance</a>
+          <a name="get-hashtags" href="[[rootPath]]get-hashtags">Get Hashtags</a>
+          <a name="get-balance" href="[[rootPath]]get-balance">Get Balance</a>
+          <a name="get-fx" href="[[rootPath]]get-fx">Get FX</a>
 
-          
         </iron-selector>
       </app-drawer>
 
@@ -130,6 +137,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <my-geohash-distance name="geohash-distance"></my-geohash-distance>
           <my-default-language name="default-language"></my-default-language>
           <my-translation-available name="translation-available"></my-translation-available>
+          <my-get-hashtags name="get-hashtags"></my-get-hashtags>
+          <my-get-balance name="get-balance"></my-get-balance>
+          <my-get-fx name="get-fx"></my-get-fx>
           <my-view404 name="view404"></my-view404>
         </iron-pages>
       </app-header-layout>
