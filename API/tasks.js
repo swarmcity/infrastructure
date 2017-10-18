@@ -6,6 +6,7 @@ module.exports = function(web3) {
   const getFx = require('./tasks/getFx.js')(web3);
   const getGasPrice = require('./tasks/getGasPrice.js')(web3);
   const getHashtags = require('./tasks/getHashtags.js')(web3);
+  const Avatar = require('./tasks/Avatar.js')(web3);
 
   return {
     /**
@@ -48,6 +49,26 @@ module.exports = function(web3) {
         return res;
       }).catch((err) => {
         console.log('get hashtags ERR! ', err)
+      });
+    },
+
+    _getAvatar: function(queue, task) {
+      return Avatar._getAvatar(task.hash).then((res) => {
+        task.socket.emit('getAvatar', res);
+        queue(task, "remove");
+        return res;
+      }).catch((err) => {
+        console.log('get avatar ERR! ', err)
+      });
+    },
+
+    _setAvatar: function(queue, task) {
+      return Avatar._setAvatar(task.base64).then((res) => {
+        task.socket.emit('setAvatar', res);
+        queue(task, "remove");
+        return res;
+      }).catch((err) => {
+        console.log('set avatar ERR! ', err)
       });
     },
 

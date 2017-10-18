@@ -44,6 +44,36 @@
       "constant": false,
       "inputs": [
         {
+          "name": "_newCommission",
+          "type": "uint256"
+        }
+      ],
+      "name": "setCommission",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "mintSeekerRep",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
           "name": "_factoryAddress",
           "type": "address"
         }
@@ -81,18 +111,14 @@
     },
     {
       "constant": false,
-      "inputs": [
+      "inputs": [],
+      "name": "getSeekerRepTokenAddress",
+      "outputs": [
         {
-          "name": "_receiver",
+          "name": "",
           "type": "address"
-        },
-        {
-          "name": "_amount",
-          "type": "uint256"
         }
       ],
-      "name": "mintRep",
-      "outputs": [],
       "payable": false,
       "type": "function"
     },
@@ -111,29 +137,12 @@
     },
     {
       "constant": false,
-      "inputs": [
-        {
-          "name": "_dealContract",
-          "type": "address"
-        },
-        {
-          "name": "_dealOwner",
-          "type": "address"
-        }
-      ],
-      "name": "registerDeal",
-      "outputs": [],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
       "inputs": [],
-      "name": "registeredDeals",
+      "name": "getProviderRepTokenAddress",
       "outputs": [
         {
           "name": "",
-          "type": "uint256"
+          "type": "address"
         }
       ],
       "payable": false,
@@ -153,15 +162,19 @@
       "type": "function"
     },
     {
-      "constant": true,
-      "inputs": [],
-      "name": "successfulDeals",
-      "outputs": [
+      "constant": false,
+      "inputs": [
         {
-          "name": "",
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
           "type": "uint256"
         }
       ],
+      "name": "mintProviderRep",
+      "outputs": [],
       "payable": false,
       "type": "function"
     },
@@ -192,19 +205,6 @@
       "type": "function"
     },
     {
-      "constant": false,
-      "inputs": [],
-      "name": "getRepTokenAddress",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [],
       "name": "validFactories",
@@ -221,5 +221,5 @@
   "unlinked_binary": "0x",
   "networks": {},
   "schema_version": "0.0.5",
-  "updated_at": 1498836059910
+  "updated_at": 1508099536214
 }
