@@ -8,9 +8,9 @@ const Web3 = require('web3');
 //connect
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'))
 
-
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
+const newItem = require('./tasks/newItem.js')(web3);
 
 
 // install fs and save logs to txt file
@@ -139,6 +139,16 @@ io.on('connection', function(socket) {
         //console.log('requests', data);
         response({
             status: 200
+        });
+    });
+    socket.on('createItem', (data, response) => {
+        console.log('createItem', data);
+        // Make promise, store deal and return txhash
+        return newItem._newItem(data).then((res) => {
+          socket.emit('newItemChanged', res);
+          response({ status: 200, res});
+        }).catch((err) => {
+          console.log('newItem ERR! ', err)
         });
     });
     socket.on('broadcastTransaction', (data, response) => {
