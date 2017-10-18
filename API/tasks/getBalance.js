@@ -7,22 +7,6 @@ module.exports = function(web3) {
 		 * @param {Array} tokens - The tokens to be fetched
 		 * @return {Array} - Balances of that user
 		 */
-
-		/**
-		 * Represents a users balance
-		 * @response
-		 * @param {number} response - The HTTP response code
-		 * @param {array} balances - An array of tokens and their balance
-		 * @param {string} pubkey - A public key (0x...)
-		 * @param {array} data - an array of balance objects
-		 * @param {string} tokenSymbol - The token's short name
-		 * @param {string} tokenName - The token's long name ('Swarm City Token', 'NeedARide', 'Ether')
-		 * @param {string} tokenContractAddress - A token address (0x...)
-		 * @param {string} balance - in wei or smallest erc20
-		 * @param {string} subscription - the socket connection id
-		 * @param {number} nonce - nonce
-		 */
-
 		_getBalance: function(address) {
 
 			return new Promise((resolve, reject) => {
