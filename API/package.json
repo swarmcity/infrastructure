@@ -10,7 +10,12 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.3",
+    "memory-cache": "^0.2.0",
+    "request": "^2.83.0",
     "socket.io": "^2.0.3",
     "web3": "^1.0.0-beta.22"
+  },
+  "devDependencies": {
+    "should": "^13.1.2"
   }
 }
