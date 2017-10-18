@@ -1,35 +1,51 @@
 module.exports = function(web3) {
 
-const https = require('https');
+	const cache = require('memory-cache');
+	const request = require('request');
 
-return ({
+	return ({
 
-_getFx: function(address) {
+		_getFx: function(address) {
 
-  return new Promise((resolve, reject) => {
-    var url = 'https://api.swarm.city/swtprice';
+			return new Promise((resolve, reject) => {
 
-    https.get(url, function(res){
-        var body = '';
+				const r = cache.get('swtprice');
+				if (r) {
+					resolve(r.data);
+				} else {
 
-        res.on('data', function(chunk){
-            body += chunk;
-        });
+					request('https://api.coinmarketcap.com/v1/ticker/swarm-city/?convert=EUR', (error, response, body) => {
 
-        res.on('end', function(){
-            var prices = JSON.parse(body);
-            console.log("Got a response: ", prices);
-            resolve(prices);
+						if (error && (response || response.statusCode !== 200)) {
+							reject(error);
+						}
 
-        });
-    }).on('error', function(e){
-        console.log("Got an error: ", e);
-    });
+						let p = JSON.parse(body);
 
-  });
-}
+						let r = {
+							price_btc: p[0].price_btc,
+							price_eur: p[0].price_eur,
+							price_usd: p[0].price_usd,
+							symbol: p[0].symbol
+						};
 
+            // we should cache the response, to avoid our IP
+            // being banned from the coinmarketcap API
+            // see https://coinmarketcap.com/api/
+            // prices are updated every 5 minutes
+            // we cache 1 minute
+						cache.put('swtprice', [Object.assign({}, r, {
+							cached_at: new Date()
+						})], 60 * 1000);
 
-});
+						resolve(r);
+
+					});
+
+				}
+
+			});
+		}
+	});
 
 }
