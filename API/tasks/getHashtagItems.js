@@ -6,23 +6,6 @@ module.exports = function(web3) {
 
 		_getHashtagItems: function(hashtag) {
 
-
-			/**
-			 * Represents the hashtagsItems response
-			 * @response
-			 * @param {number} response - The HTTP response code
-			 * @param {string} subscriptionId - String generated on server
-			 * @param {array} itemsData - an array of OnHashtagItemsSubscribe objects
-			 * @param {string} hashtagName - the name of the hashtag contract
-			 * @param {object} hashtagData - the meta data of the hashtag contract
-			 * @param {string} hashtagDescription - The description of the hashtag
-			 * @param {number} hashtagItems - The number of hashtag items / deals on chain
-			 * @param {string} hastagMaintainer - The public key of the hashtag maintainer
-			 * @param {string} hastagContact - Array with contact information
-			 * @param {string} contactName - The name of the contact ('Twitter')
-			 * @param {string} contactLink - The link to the contact info ('https://twitter.com/NeedARideSupport')
-			 */
-
 			const returnObject = [{},
 				{
 					"response": 200,
