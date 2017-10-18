@@ -13,7 +13,7 @@ describe("Swarm City API socket client", function() {
 
 	let client;
 
-	it('should receive "connect" event right after connect', function(done) {
+	it('should receive all related events right after socket connects', function(done) {
 		client = io.connect(socketURL, options);
 		client.on('connected', function(data) {
 			console.log('client id=', client.id);
