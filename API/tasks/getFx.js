@@ -5,7 +5,7 @@ module.exports = function(web3) {
 			return new Promise((resolve, reject) => {
 				request('https://api.coinmarketcap.com/v1/ticker/swarm-city/?convert=EUR',
 				(error, response, body) => {
-					if (error && (response || response.statusCode !== 200)) {
+					if (error || (response && response.statusCode !== 200)) {
 						reject(error);
 					}
 					let parsedBody = JSON.parse(body);

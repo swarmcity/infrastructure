@@ -10,30 +10,35 @@ describe('Swarm City API socket client', function() {
 	it('should receive all related events right after socket connects', function(done) {
 		client = io.connect(socketURL, options);
 		client.on('connected', function(data) {
-		});
-		let promises = [];
-		promises.push(new Promise((resolve, reject) => {
-			client.on('balanceChanged', (data) => {
-				resolve();
+
+			let promises = [];
+			promises.push(new Promise((resolve, reject) => {
+				client.on('balanceChanged', (data) => {
+					console.log('');
+					resolve();
+				});
+			}));
+			promises.push(new Promise((resolve, reject) => {
+				client.on('fxChanged', (data) => {
+					console.log('fxChanged');
+					resolve();
+				});
+			}));
+			promises.push(new Promise((resolve, reject) => {
+				client.on('gasPriceChanged', (data) => {
+					console.log('gasPriceChanged');
+					resolve();
+				});
+			}));
+			promises.push(new Promise((resolve, reject) => {
+				client.on('hashtagsChanged', (data) => {
+					console.log('hashtagsChanged');
+					resolve();
+				});
+			}));
+			Promise.all(promises).then(() => {
+				done();
 			});
-		}));
-		promises.push(new Promise((resolve, reject) => {
-			client.on('fxChanged', (data) => {
-				resolve();
-			});
-		}));
-		promises.push(new Promise((resolve, reject) => {
-			client.on('gasPriceChanged', (data) => {
-				resolve();
-			});
-		}));
-		promises.push(new Promise((resolve, reject) => {
-			client.on('hashtagsChanged', (data) => {
-				resolve();
-			});
-		}));
-		Promise.all(promises).then(() => {
-			done();
 		});
 	});
 	after(function(done) {
