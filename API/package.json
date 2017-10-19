@@ -4,7 +4,9 @@
   "description": "",
   "main": "socket.js",
   "scripts": {
-    "test": "mocha --timeout 10000 test/*"
+    "test": "mocha --timeout 10000 test/*",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "MIT",
@@ -15,6 +17,8 @@
     "web3": "^1.0.0-beta.22"
   },
   "devDependencies": {
-    "should": "^13.1.2"
+    "should": "^13.1.2",
+    "eslint": "^4.9.0",
+    "eslint-config-google": "^0.9.1"
   }
 }
