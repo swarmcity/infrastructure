@@ -1,5 +1,5 @@
 {
-  "contract_name": "HashtagSimpleDeal",
+  "contract_name": "hashtagSimpleDeal",
   "abi": [
     {
       "constant": true,

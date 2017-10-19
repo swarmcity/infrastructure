@@ -1,5 +1,5 @@
 {
-  "contract_name": "MiniMeToken",
+  "contract_name": "miniMeToken",
   "abi": [
     {
       "constant": true,
