@@ -38,7 +38,7 @@
                     */
                     language: {
                         type: String,
-                    }
+                    },
                 };
             }
 
@@ -47,9 +47,8 @@
                 this.$.language.defulatLanguage()
                 .then((language) => {
                     this.language = language;
-                })
+                });
             }
-
         } window.customElements.define(DefaultLanguage.is, DefaultLanguage);
     </script>
 </dom-module>

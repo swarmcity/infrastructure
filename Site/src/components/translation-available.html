@@ -39,7 +39,7 @@
                     */
                     language: {
                         type: String,
-                    }
+                    },
                 };
             }
 
@@ -51,10 +51,9 @@
                     return this.$.language.translationAvailable(language);
                 })
                 .then((available) => {
-                    this.available = available.found
-                })
+                    this.available = available.found;
+                });
             }
-
         } window.customElements.define(TranslationAvailable.is, TranslationAvailable);
     </script>
 </dom-module>

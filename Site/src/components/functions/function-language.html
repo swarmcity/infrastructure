@@ -22,6 +22,7 @@
             /**
              *  translation available
              * @return {object} object represents an error or a location object
+             * @argument {String} language represents an error or a location object
              */
             translationAvailable(language) {
                 return new Promise((resolve, reject) => {
@@ -49,7 +50,6 @@
                     xobj.send(null);
                 });
             }
-
         } window.customElements.define(FunctionLanguage.is, FunctionLanguage);
     </script>
 </dom-module>

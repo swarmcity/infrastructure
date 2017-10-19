@@ -92,20 +92,19 @@
                 };
         }
 
-        _checkPassword(){
-            if(this.password.length >= 10){
+        _checkPassword() {
+            if (this.password.length >= 10) {
                 this.disabled = false;
             } else {
                 this.disabled = true;
             }
         }
-        _decrypt(keystore){
+        _decrypt(keystore) {
             this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
             .then((data) => {
-                console.log(data);
-            })
+                // console.log(data);
+            });
         }
-        
         } window.customElements.define(UnlockWallet.is, UnlockWallet);
     </script>
 </dom-module>

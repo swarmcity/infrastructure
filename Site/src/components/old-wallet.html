@@ -94,23 +94,23 @@
                 };
         }
 
-        _checkPassword(){
-            if(this.password.length >= 5){
+        _checkPassword() {
+            if (this.password.length >= 5) {
                 this.disabled = false;
             } else {
                 this.disabled = true;
             }
         }
-        _decrypt(){
+        _decrypt() {
             const keystore = lightwallet.keystore.deserialize(this.wallet.keystore);
             keystore.keyFromPassword(this.password, function(err, pwDerivedKey) {
-                if(!err){
-                    var privatekey = keystore.exportPrivateKey('0x' + keystore.getAddresses()[0], pwDerivedKey);
-                    console.log(privatekey);
+                if (!err) {
+                    // var privatekey = keystore.exportPrivateKey('0x' + keystore.getAddresses()[0],
+                    // pwDerivedKey);
+                    // console.log(privatekey);
                 }
             });
         }
-        
         } window.customElements.define(OldWallet.is, OldWallet);
     </script>
 </dom-module>

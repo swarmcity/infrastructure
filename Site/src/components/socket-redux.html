@@ -3,13 +3,10 @@
 <dom-module id="socket-redux">
 
     <script>
-
         class SocketRedux extends new ReduxMixin(Polymer.Element) {
-
             static get is() {
                 return 'socket-redux';
             }
-
             static get properties() {
                 return {
                     /**
@@ -35,7 +32,6 @@
                     },
                 };
             }
-
             /**
             * Redux action for sertting balance
             * @param {balance} balance
@@ -62,10 +58,8 @@
                     },
                 });
             }
-
             ready() {
                 super.ready();
-                console.log('ready')
                 socket.on('balanceChanged', (data) => {
                     this.balance = data;
                     this.dispatch('BALANCE', this.balance);
@@ -79,7 +73,6 @@
                     this.dispatch('HASHTAGS', this.hashtags);
                 });
             }
-        
         } window.customElements.define(SocketRedux.is, SocketRedux);
     </script>
 </dom-module>
