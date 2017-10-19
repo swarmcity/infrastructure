@@ -8,7 +8,7 @@ module.exports = function(web3) {
 		_getBalance: function(address) {
 			return new Promise((resolve, reject) => {
 				let promisesList = [];
-				const minimeContract = require('../contracts/MiniMeToken.json');
+				const minimeContract = require('../contracts/miniMeToken.json');
 				const tokens = ['SWT', 'ARC'];
 				const tokenIndex = require('../contracts/index.json');
 				tokens.forEach((token) => {
