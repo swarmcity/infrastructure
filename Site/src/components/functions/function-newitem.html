@@ -21,9 +21,31 @@
             newItem(privateKey, message, address, date, location, swtvalue) {
                 return new Promise((resolve, reject) => {
                     if (privateKey && message && address && date && location && swtvalue) {
-                      
+
+                        // First create allowance on the SWT contract
+                        var swtContract = new dragon.Contract(abis.miniMeToken.abi);
+                        var encodedAllowance = swtContract.methods.approve("0x3fE6c29a5854D55d5B685B9C3502B885a6B2599B", 600000000000000000).encodeABI();
+
+                        const approveRawTx = {
+                          nonce: 10,
+                          gasPrice: 1500000000000000,
+                          gasLimit: 200000,
+                          to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                          value: "600000000000000000",
+                          data: encodedAllowance,
+                          chainId: 1
+                        };
+
+                        var approvetx = new dragon.Transaction(approveRawTx);
+
+                        approvetx.sign(privateKey);
+                        var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
+
+                        // Deliver it to the API
+
+                        // Then create the transaction
                         var simpleDealContract = new dragon.Contract(abis.hashtag.abi);
-                        var encodedthing = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
+                        var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
 
                         const rawTx = {
                           nonce: 10,
@@ -31,14 +53,20 @@
                           gasLimit: 200000,
                           to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
                           value: "600000000000000000",
-                          data: encodedthing,
+                          data: encodedSimpleDealTx,
                           chainId: 1
                         };
 
                         var tx = new dragon.Transaction(rawTx);
                         tx.sign(privateKey);
                         var signedTx = dragon.addHexPrefix(tx.serialize().toString('hex'));
-                        resolve(signedTx);
+
+                        // Only deliver it to the API when the ApproveTx is mined.
+
+                        // Then we get the txhash back from the API, indicating the successful injection
+                        var txHash = "0x000";
+
+                        resolve(txHash);
 
                     } else {
                         reject(Error('Missing Arguments'));
