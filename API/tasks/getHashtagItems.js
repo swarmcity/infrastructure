@@ -17,7 +17,7 @@ module.exports = function(web3) {
 							},
 						],
 					}],
-					'itemsData': {
+					'itemsData': [{
 						'itemId': '0x000',
 						'name': 'Faffy D',
 						'avatar': 'IPFS',
@@ -27,7 +27,7 @@ module.exports = function(web3) {
 						'location': 'u1557fpvm1hb',
 						'value': 12,
 					},
-					'itemsData': {
+					{
 						'itemId': '0x000',
 						'name': 'Faffy D',
 						'avatar': 'IPFS',
@@ -37,7 +37,7 @@ module.exports = function(web3) {
 						'location': 'u1557fpvm1hb',
 						'value': 12,
 					},
-					'itemsData': {
+					{
 						'itemId': '0x000',
 						'name': 'Faffy D',
 						'avatar': 'IPFS',
@@ -46,7 +46,7 @@ module.exports = function(web3) {
 						'dateTime': 1508335855072,
 						'location': 'u1557fpvm1hb',
 						'value': 12,
-					},
+					}],
 				}];
 			return new Promise((resolve, reject) => {
 				logs._eventLog('HashtagsItems: ', returnObject);

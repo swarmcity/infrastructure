@@ -1,5 +1,6 @@
 module.exports = function(web3) {
 	const request = require('request');
+	let result;
 	return ({
 		_updateFx: function() {
 			return new Promise((resolve, reject) => {
