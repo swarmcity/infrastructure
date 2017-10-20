@@ -9,7 +9,15 @@ import {
   ecrecover,
   toBuffer,
   bufferToHex,
-  fromRpcSig} from 'ethereumjs-util';
+  fromRpcSig,
+  padToEven,
+  addHexPrefix
+} from 'ethereumjs-util';
+
+import { abi } from 'ethereumjs-abi';
+
+//import { EthTx } from 'ethereumjs-tx';
+
 import {
   createHash,
   randomBytes,
@@ -41,4 +49,7 @@ export {
   uuid,
   Buffer,
   QRCode,
+  padToEven,
+  addHexPrefix,
+  abi
 };

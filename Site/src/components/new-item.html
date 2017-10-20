@@ -1,0 +1,168 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-wallet.html">
+<link rel="import" href="functions/function-message.html">
+<link rel="import" href="functions/function-newitem.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="new-item">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-wallet id="wallet"></function-wallet>
+        <function-message id="message"></function-message>
+        <function-newitem id="newitem"></function-newitem>
+        <div class="container">
+            <h1>New Item</h1>
+            <p>#BoardwalkTest</p>
+            <paper-input char-counter label="Hashtag" value="0x3fE6c29a5854D55d5B685B9C3502B885a6B2599B"></paper-input>
+            </br>
+            <input type="file" name="file" id="file" class="inputfile" on-change="_getFile"/>
+            </br>
+            <label for="file">
+                <paper-button toggles raised>Select Keystore</paper-button>
+            </label>
+            <template is="dom-if" if="{{askPassword}}">
+                <paper-input char-counter type="password" label="Password" value="{{password}}" on-keyup="_checkPassword"></paper-input>
+            </template>
+            </br>
+          </br>
+            <p>The message of the item:</p>
+            <paper-input char-counter label="Message" value="{{message}}"></paper-input>
+            </br>
+            <p>The value in SWT:</p>
+            <paper-input char-counter label="SWT" value="{{swtvalue}}"></paper-input>
+            </br>
+            <p>The location (cryptospot):</p>
+            <paper-input char-counter label="Location" value="u1557v4g46"></paper-input>
+            </br>
+        </br></br>
+
+        <paper-button toggles raised on-click="_createItem">Register deal</paper-button>
+        </br></br>
+        <template is="dom-if" if="{{signedMessage}}">
+            <paper-textarea label="Signed Item" value="{{signedtx}}"></paper-textarea>
+            <p>This is your signed deal you can send or broadcast publicly</p>
+        </template>
+
+        </div>
+    </template>
+    <script>
+        class NewItem extends Polymer.Element {
+            static get is() {
+                return 'new-item';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * is the unlock button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * show the password
+                    * @type {Boolean}
+                    */
+                    askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    location: {
+                        type: String,
+                        value: "u1557v4g46"
+                    }
+                };
+            }
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                const file = event.target.files[0];
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = () => {
+                    this.keystore = JSON.parse(reader.result);
+                    this.askPassword = true;
+                };
+                reader.onerror = (error) => {
+                    this.loading = false;
+                    this.error = error;
+                };
+        }
+
+
+        _checkPassword() {
+            if (this.password.length >= 10) {
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        }
+        _createItem(keystore) {
+            this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
+            .then((data) => {
+                const privateKey = data;
+                const message = this.message;
+                const address = this.keystore.address;
+                const date = Date.now();
+                const location = this.location;
+                const swtvalue = this.swtvalue;
+                return this.$.newitem.newItem(privateKey, message, address, date, location, 10);
+            })
+            .then((data) => {
+                const signature = data;
+                this.signedtx = signature;
+                this.signedMessage = true;
+            });
+        }
+        // _makeDate() {
+        //     var today = new Date();
+        //     var dd = today.getDate();
+        //     var mm = today.getMonth()+1;
+        //     var yyyy = today.getFullYear();
+        //     if (dd<10) {
+        //         dd = '0'+dd;
+        //     }
+        //     if (mm<10) {
+        //         mm = '0'+mm;
+        //     }
+        //     today = mm + '/' + dd + '/' + yyyy;
+        //     return today;
+        // }
+      } window.customElements.define(NewItem.is, NewItem);
+    </script>
+</dom-module>
