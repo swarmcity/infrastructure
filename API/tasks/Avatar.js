@@ -1,3 +1,4 @@
+// TODO: Rename this file to lowecaseavata.js
 module.exports = function(web3) {
   return ({
     /**
@@ -7,9 +8,10 @@ module.exports = function(web3) {
 		*/
     _setAvatar: function(base64) {
       return new Promise((resolve, reject) => {
-        ipfs.add(base64, function(err, res) {
-          resolve(res);
-        });
+        // TODO: Send the image to the /Store container 
+        // ipfs.add(base64, function(err, res) {
+        //   resolve(res);
+        // });
       });
     },
 		/**
@@ -19,22 +21,23 @@ module.exports = function(web3) {
 		*/
     _getAvatar: function(hash) {
       return new Promise((resolve, reject) => {
-        ipfs.cat(hash, function(err, res) {
-          let buf = '';
-          if (err) {
-            resolve(err);
-          }
-          res
-            .on('error', function(err) {
-              throw (err);
-            })
-            .on('data', function(data) {
-              buf += data;
-            })
-            .on('end', function() {
-              resolve(buf);
-            });
-        });
+        // TODO: Send the image to the /Store container 
+        // ipfs.cat(hash, function(err, res) {
+        //   let buf = '';
+        //   if (err) {
+        //     resolve(err);
+        //   }
+        //   res
+        //     .on('error', function(err) {
+        //       throw (err);
+        //     })
+        //     .on('data', function(data) {
+        //       buf += data;
+        //     })
+        //     .on('end', function() {
+        //       resolve(buf);
+        //     });
+        // });
       });
     },
   });

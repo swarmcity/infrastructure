@@ -1,7 +1,6 @@
 'use strict';
-
 const app = require('express')();
-const server = require('http').Server(app);
+const server = require('http').Server(app); // eslint-disable-line
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'));
@@ -181,7 +180,7 @@ function _queueManager() {
  * Block Watcher
  */
 function _blockWatcher() {
-	let subscription = web3.eth.subscribe('newBlockHeaders', function(error, result) {
+	web3.eth.subscribe('newBlockHeaders', function(error, result) {
 		if (!error) {
 			connected.forEach(function(data) {
 				// const getBalance = {
