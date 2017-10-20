@@ -217,6 +217,9 @@ function _taskScheduler(taskList) {
 	if (taskInProgress == false) {
 		taskInProgress = true;
 		return taskList.reduce((chain, task) => {
+// TODO: Stop passing in _queue, get the value back here then deal with the queue ot other global
+// task.toDo needs to return a promise and resolve the data
+// maybe pass the data to a response manager that ensures the respinse is not a duplicate?
 			return chain.then(() => task.toDo(_queue, task));
 		}, Promise.resolve()).then(() => {
 			taskInProgress = false;
