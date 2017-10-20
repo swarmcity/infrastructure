@@ -129,7 +129,7 @@
                 })
                 .then(() => {
                     var myWindow = window.open('', 'MsgWindow', 'width=800,height=600', '_blank');
-                    myWindow.document.write("<title>Print Paper Wallet</title><img src='"+this.addressQR+"' class='address'><p>Your Ethereum Address: "+this.wallet.address+"</p><img src='"+this.privateKeyQR+"' class='private-key'><p>Your Private Key: "+this.wallet.privateKey+"</p>");
+                    myWindow.document.write("<title>Print Paper Wallet</title><img src='"+this.addressQR+"' class='address'><p>Your Ethereum Address: "+this.wallet.address+"</p><img src='"+this.privateKeyQR+"' class='private-key'><p>Your Private Key: "+this.wallet.privateKey+"</p>"); // eslint-disable-line
                     setTimeout(function() {myWindow.print();}, 200);
                     myWindow.onfocus = function() {setTimeout(function() {myWindow.close();}, 200);};
                 });
