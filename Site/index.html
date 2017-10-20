@@ -63,9 +63,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var publicKey = localStorage.getItem('publickeytest');
       const socket = io.connect('http://localhost:8011', {query: 'publicKey='+publicKey});
 
-      socket.emit('createItem', 'DEALDATA', function(data) {
-        // handle createItem reply here.
+      socket.on('connected', function (data) {
+        console.log(socket.id, data);
       });
+      socket.on('balanceChanged', function (data) {
+        console.log(socket.id, data);
+        window.kf = data;
+      });
+
+
+
 
     </script>
     <script>

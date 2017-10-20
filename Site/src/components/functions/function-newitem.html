@@ -27,7 +27,7 @@
                         var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
 
                         const rawTx = {
-                          nonce: 10,
+                          nonce: window.kf[3].nonce++,
                           gasPrice: 1500000000000000,
                           gasLimit: 200000,
                           to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
@@ -39,9 +39,19 @@
                         var tx = new dragon.Transaction(rawTx);
                         var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
 
+
+
+
                         // Then we can call approveAndCall on the SWT contract
-                        var swtContract = new dragon.Contract(abis.miniMeToken.abi);
-                        var encodedAllowance = swtContract.methods.approveAndCall("0x3fE6c29a5854D55d5B685B9C3502B885a6B2599B", 600000000000000000, serializedtx).encodeABI();
+                        var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+                        debugger;
+                          swtContract.methods.approveAndCall("0x3fE6c29a5854D55d5B685B9C3502B885a6B2599B", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
+                        .then(function(gasAmount){
+                             var gasNeeded = gasAmount;
+                             debugger;
+                         }).catch(function(error){
+                             console.log('error in gasamaount');
+                         });
 
                         const approveRawTx = {
                           nonce: 10,
@@ -59,14 +69,9 @@
                         var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
 
                         // Deliver it to the API
-
-
-
-
-                        // Only deliver it to the API when the ApproveTx is mined.
-
+                        socket.emit('processTx', signedApproveTx);
                         // Then we get the txhash back from the API, indicating the successful injection
-                        var txHash = "0x000";
+                        //var txHash = "0x000";
 
                         resolve(signedApproveTx);
 

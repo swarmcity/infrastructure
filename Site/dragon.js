@@ -2,6 +2,8 @@ import ABI from 'ethereumjs-abi';
 
 import Contract from 'web3-eth-contract';
 
+import estimateGas from 'web3-eth-contract';
+
 import sign from 'ethereumjs-tx';
 
 import Transaction from 'ethereumjs-tx';
@@ -58,5 +60,6 @@ export {
   padToEven,
   addHexPrefix,
   sign,
-  Transaction
+  Transaction,
+  estimateGas
 };

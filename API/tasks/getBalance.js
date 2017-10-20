@@ -36,6 +36,15 @@ module.exports = function(web3) {
 						tokenContractAddress: '0x0',
 					};
 				}));
+				promisesList.push(web3.eth.getTransactionCount(address)
+				.then((res) => {
+					return {
+						nonce: res,
+						publicKey: address,
+					};
+				}));
+
+			
 				resolve(Promise.all(promisesList));
 			});
 		},

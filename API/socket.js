@@ -76,7 +76,7 @@ io.on('connection', function(socket) {
 	_queue(getHashtags, 'add');
 	_queue(getGasPrice, 'add');
 	_queue(getBalance, 'add');
-	_queue(getFx, 'add');
+	//_queue(getFx, 'add');
 
 	socket.on('disconnect', () => {
 		connected = connected.filter(function(obj) {
@@ -142,8 +142,8 @@ io.on('connection', function(socket) {
 
 /**
  * Queue
- * @param {Object} task 
- * @param {String} direction 
+ * @param {Object} task
+ * @param {String} direction
  */
 function _queue(task, direction) {
 	if (task && direction == 'add') {
@@ -184,15 +184,15 @@ function _blockWatcher() {
 	let subscription = web3.eth.subscribe('newBlockHeaders', function(error, result) {
 		if (!error) {
 			connected.forEach(function(data) {
-				// const getBalance = {
-				// 	nextRun: 0,
-				// 	interval: 0,
-				// 	toDo: tasks._getBalance,
-				// 	publicKey: data.publicKey,
-				// 	socket: data.socket,
-				// };
+				const getBalance = {
+					nextRun: 0,
+					interval: 0,
+					toDo: tasks._getBalance,
+					publicKey: data.publicKey,
+					socket: data.socket,
+				};
 
-				// _queue(getBalance, 'add');
+				 _queue(getBalance, 'add');
 
 				// const getFx = {
 				// 	nextRun: 0,
@@ -211,8 +211,8 @@ function _blockWatcher() {
 
 /**
  * Task Scheduler
- * @param {Array} taskList 
- * @return {Array} 
+ * @param {Array} taskList
+ * @return {Array}
  */
 function _taskScheduler(taskList) {
 	if (taskInProgress == false) {
