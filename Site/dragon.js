@@ -1,3 +1,10 @@
+import ABI from 'ethereumjs-abi';
+
+import Contract from 'web3-eth-contract';
+
+import sign from 'ethereumjs-tx';
+
+import Transaction from 'ethereumjs-tx';
 
 import {
   sha3,
@@ -14,22 +21,21 @@ import {
   addHexPrefix
 } from 'ethereumjs-util';
 
-import { abi } from 'ethereumjs-abi';
-
-//import { EthTx } from 'ethereumjs-tx';
-
 import {
   createHash,
   randomBytes,
   createCipheriv,
   pbkdf2Sync,
-  createDecipheriv} from 'crypto';
+  createDecipheriv } from 'crypto';
+
 import scrypt from 'scryptsy';
 import uuid from 'uuid';
 import Buffer from 'buffer';
 import QRCode from 'qrcode';
 
 export {
+  ABI,
+  Contract,
   sha3,
   privateToAddress,
   privateToPublic,
@@ -51,5 +57,6 @@ export {
   QRCode,
   padToEven,
   addHexPrefix,
-  abi
+  sign,
+  Transaction
 };
