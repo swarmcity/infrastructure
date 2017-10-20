@@ -21,10 +21,9 @@
             newItem(privateKey, message, address, date, location, swtvalue) {
                 return new Promise((resolve, reject) => {
                     if (privateKey && message && address && date && location && swtvalue) {
-                        // We will connect to web3 metamask for now because I can't dragonize the Contract function
+                      
                         var simpleDealContract = new dragon.Contract(abis.hashtag.abi);
                         var encodedthing = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
-                        // Now create a tx to sign
 
                         const rawTx = {
                           nonce: 10,
@@ -36,41 +35,11 @@
                           chainId: 1
                         };
 
-                        debugger;
-
                         var tx = new dragon.Transaction(rawTx);
-
                         tx.sign(privateKey);
-
                         var signedTx = dragon.addHexPrefix(tx.serialize().toString('hex'));
-
                         resolve(signedTx);
 
-
-
-
-
-
-
-
-                        // create deal object
-                        // First SHA the dealId
-                        // var secretCode = "randomNumber";
-                        // var dealId = "FlurkelSponnetDeal"+secretCode;
-                        // var shaDealId = web3sc.utils.sha3(dealId);
-                        // simpleDealContract.makeDealForTwo.encodeABI(shaDealId, 10, "QfIPFS", {
-                        //   from: from,
-                        //   gasPrice: gasPrice,
-                        //   gas: gasNeeded
-                        // }, function(err, makeDealForTwoTx) {
-                        //   if (err) {
-                        //     //return cb(err);
-                        //   }
-                        //   //cb(null, makeDealForTwoTx, extratx);
-                        //   console.log(err, makeDealForTwoTx, extratx);
-                        // });
-                        //dragon.abi();
-                        // Sign tx
                     } else {
                         reject(Error('Missing Arguments'));
                     }
