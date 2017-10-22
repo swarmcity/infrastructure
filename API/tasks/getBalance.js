@@ -43,8 +43,14 @@ module.exports = function(web3) {
 						publicKey: address,
 					};
 				}));
+				promisesList.push(web3.eth.getGasPrice()
+				.then((res) => {
+					return {
+						gasPrice: res
+					};
+				}));
 
-			
+
 				resolve(Promise.all(promisesList));
 			});
 		},

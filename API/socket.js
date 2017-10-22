@@ -9,6 +9,8 @@ const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
 const getHashtagItems = require('./tasks/getHashtagItems.js')(web3);
+const estimateGas = require('./tasks/estimateGas.js')(web3);
+const taskFunctions = require('./tasks/index.js');
 
 let connected = [];
 let queue = [];
@@ -125,6 +127,22 @@ io.on('connection', function(socket) {
 	socket.on('saveAvatar', (data, response) => {
 		response({
 			status: 200,
+		});
+	});
+  socket.on('jsonToIpfs', (data, response) => {
+		response({
+			status: 200,
+		});
+	});
+  socket.on('estimateGas', (data, response) => {
+    estimateGas._estimateGas(data).then((gasNeeded) => {
+			//socket.emit('estimateGasChanged', res);
+			response({
+				status: 200,
+				gasNeeded: gasNeeded
+			});
+		}).catch((err) => {
+			logs._errorLog('estimateGas ERR! ', err);
 		});
 	});
 	socket.on('getNoonce', (data, response) => {

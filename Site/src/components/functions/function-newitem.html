@@ -22,14 +22,28 @@
                 return new Promise((resolve, reject) => {
                     if (privateKey && message && address && date && location && swtvalue) {
 
+                        // Call the api for getGasPrice
+                        //socket.emit('getGasPrice', {from: publicKey});
+
+
+
+                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+
+                        // var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+
+                        //  simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").estimateGas({from: window.kf[3].publicKey})
+                        // .then(function(gasAmount){
+                        //     var gasNeededSimpleDeal = gasAmount;
+                        //     console.log("gasamount: ",gasAmount);
+                        //  }).catch(function(error){
+                        //      console.log('error in gasamaount');
+                        //  });
+
                         // First create the transaction
-                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi);
+
                         var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
 
                         const rawTx = {
-                          nonce: window.kf[3].nonce++,
-                          gasPrice: 1500000000000000,
-                          gasLimit: 200000,
                           to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
                           value: "600000000000000000",
                           data: encodedSimpleDealTx,
@@ -39,38 +53,52 @@
                         var tx = new dragon.Transaction(rawTx);
                         var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
 
+                        // Call the api for estimateGas
+                        // data.publicKey
+                        // data.extradata
+                        const getGasPriceData = {
+                          hashtagAddress: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                          extraData: serializedtx,
+                          publicKey: window.kf[3].publicKey,
+                          dealValue: 600000000000000000
+                        }
+
+                        socket.emit('estimateGas', getGasPriceData, function(gasNeeded){
+                          var gasNeeded = gasNeeded;
+                          console.log("gasneeded from API: ", gasNeeded);
+                        });
+
                         // Then we can call approveAndCall on the SWT contract
-                        var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
-                        debugger;
-                        swtContract.methods.approveAndCall("0x3fE6c29a5854D55d5B685B9C3502B885a6B2599B", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
-                        .then(function(gasAmount){
-                             var gasNeeded = gasAmount;
-                             debugger;
-                         }).catch(function(error){
-                             console.log('error in gasamaount');
-                         });
+                        // var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                        // debugger;
+                        // swtContract.methods.approveAndCall("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
+                        // .then(function(gasAmount){
+                        //      var gasNeeded = gasAmount;
+                        //  }).catch(function(error){
+                        //      console.log('error in gasamaount');
+                        //  });
 
-                        const approveRawTx = {
-                          nonce: 10,
-                          gasPrice: 1500000000000000,
-                          gasLimit: 200000,
-                          to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                          value: "600000000000000000",
-                          data: serializedtx,
-                          chainId: 1
-                        };
+                        // const approveRawTx = {
+                        //   nonce: 10,
+                        //   gasPrice: window.gasPrice,
+                        //   gasLimit: gasNeeded,
+                        //   to: "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607",
+                        //   value: "600000000000000000",
+                        //   data: serializedtx,
+                        //   chainId: 1
+                        // };
 
-                        var approvetx = new dragon.Transaction(approveRawTx);
+                        // var approvetx = new dragon.Transaction(approveRawTx);
 
-                        approvetx.sign(privateKey);
-                        var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
+                        // approvetx.sign(privateKey);
+                        // var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
 
                         // Deliver it to the API
-                        socket.emit('processTx', signedApproveTx);
+                        //socket.emit('processTx', signedApproveTx);
                         // Then we get the txhash back from the API, indicating the successful injection
                         //var txHash = "0x000";
 
-                        resolve(signedApproveTx);
+                        resolve("signedApproveTx");
 
                     } else {
                         reject(Error('Missing Arguments'));

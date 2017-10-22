@@ -67,9 +67,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         console.log(socket.id, data);
       });
       socket.on('balanceChanged', function (data) {
-        console.log(socket.id, data);
+        console.log('balanceChanged', socket.id, data);
         window.kf = data;
       });
+
+      socket.on('gasPriceChanged', function (data) {
+        console.log(socket.id, data);
+        window.gasPrice = data;
+      });
+
+
 
 
 
