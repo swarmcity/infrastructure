@@ -60,7 +60,7 @@ module.exports = function(web3) {
 		 * @return {Array}
 		 */
 		_getGasPrice: function(queue, task) {
-			return getGasPrice._getGasPrice(task.publicKey).then((res) => {
+			return getGasPrice._getGasPrice().then((res) => {
 				task.socket.emit('gasPriceChanged', res);
 				queue(task, 'remove');
 				return res;

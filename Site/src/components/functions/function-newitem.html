@@ -16,67 +16,107 @@
             * @param {string} date - The date to append to the message
             * @param {string} location - The date to append to the message
             * @param {string} swtvalue - The date to append to the message
+            * @param {number} hashtagfee - The fee of the hashtag at the time of the deal, each party pays half.
             * @return {object}
             */
-            newItem(privateKey, message, address, date, location, swtvalue) {
+            newItem(privateKey, message, address, date, location, swtvalue, hashtagfee) {
                 return new Promise((resolve, reject) => {
                     if (privateKey && message && address && date && location && swtvalue) {
 
-                        // Call the api for getGasPrice
-                        //socket.emit('getGasPrice', {from: publicKey});
-
-
-
-                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
-
-                        // var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-
-                        //  simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").estimateGas({from: window.kf[3].publicKey})
-                        // .then(function(gasAmount){
-                        //     var gasNeededSimpleDeal = gasAmount;
-                        //     console.log("gasamount: ",gasAmount);
-                        //  }).catch(function(error){
-                        //      console.log('error in gasamaount');
-                        //  });
-
-                        // First create the transaction
-
-                        var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
-
-                        const rawTx = {
-                          to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                          value: "600000000000000000",
-                          data: encodedSimpleDealTx,
-                          chainId: 1
-                        };
-
-                        var tx = new dragon.Transaction(rawTx);
-                        var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
-
-                        // Call the api for estimateGas
-                        // data.publicKey
-                        // data.extradata
-                        const getGasPriceData = {
-                          hashtagAddress: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                          extraData: serializedtx,
-                          publicKey: window.kf[3].publicKey,
-                          dealValue: 600000000000000000
-                        }
-
-                        socket.emit('estimateGas', getGasPriceData, function(gasNeeded){
-                          var gasNeeded = gasNeeded;
-                          console.log("gasneeded from API: ", gasNeeded);
+                        // Let's get the gas price.
+                        socket.emit('getGasPrice', function(gasPrice){
+                          var gasPrice = gasPrice;
+                          console.log("gasprice from API: ", gasPrice);
                         });
 
-                        // Then we can call approveAndCall on the SWT contract
+                        // Call the api for checkApproval
+                        // Here we need to check if the pubkey already has given an allowance
+                        var _hashtagAddress = "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6";
+                        var _publicKey = window.kf[3].publicKey;
+                        var data = {
+                          hashtagAddress: _hashtagAddress,
+                          publicKey: _publicKey,
+                          allowanceNeeded: (hashtagfee / 2) + swtvalue
+                        };
+
+                        // The socket gets the approvalStatus back.
+                        // 0: everything okay, no allowance found
+                        // 1: there's an allowance set, but it is not enough to cover this tx
+                        // 2: there's an allowance set, and it's enough to cover this tx
+
+                        socket.emit('checkApprovalStatus', data, function(_approvalStatus){
+                          var approvalStatus = _approvalStatus;
+                          console.log("approvalstatus from API: ", approvalStatus);
+                          switch (approvalStatus.approvalStatus) {
+                            case 0:
+                              console.log('i can make the deal!');
+                              break;
+                            case 1:
+                              console.log('the allowance set is not enough');
+                              break;
+                            case 2:
+                              console.log('the allowance set is high enough');
+                              break;
+                            case 3:
+                              console.log('an error occured');
+                          }
+
+                          // We can put all this logic on the worker node too. The approvalstatus could just respond with a status
+                          // if approval comes back with an existing allowance,
+                          // we need to check if the allowance is large enough to do the tx.
+                          // large enough means "bigger or equal than the dealvalue + hashtagfee"
+                          // If not, we need to first chain the tx to set the allowance to 0
+                          // Then we give a new, correct allowance.
+                          // If approval comes back with 0 allowance, we set the allowance
+                          // and chain the dealmaking tx.
+                            // if approval is 0
+                              // create approval, chain the dealmaking
+                            // if approval is not 0
+                              // Check if its enough for the deal. If yes,
+                                // go to dealmaking
+                              // if no,
+                              // create approval, chain the dealmaking.
+                        });
+
+
+
+                        // Then we can estimategas for approve on the SWT contract
                         // var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-                        // debugger;
-                        // swtContract.methods.approveAndCall("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
+                        // swtContract.methods.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
                         // .then(function(gasAmount){
                         //      var gasNeeded = gasAmount;
                         //  }).catch(function(error){
                         //      console.log('error in gasamaount');
                         //  });
+
+                        // var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+
+                        // var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
+
+                        // const rawTx = {
+                        //   to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                        //   data: encodedSimpleDealTx,
+                        // };
+
+                        // var tx = new dragon.Transaction(rawTx);
+                        // var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
+
+                        // Call the api for estimateGas
+                        // data.publicKey
+                        // data.extradata
+                        // const getGasPriceData = {
+                        //   hashtagAddress: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                        //   extraData: serializedtx,
+                        //   publicKey: window.kf[3].publicKey,
+                        //   dealValue: 600000000000000000
+                        // }
+
+                        // socket.emit('estimateGas', getGasPriceData, function(gasNeeded){
+                        //   var gasNeeded = gasNeeded;
+                        //   console.log("gasneeded from API: ", gasNeeded);
+                        // });
+
+
 
                         // const approveRawTx = {
                         //   nonce: 10,

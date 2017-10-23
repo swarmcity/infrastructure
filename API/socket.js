@@ -4,12 +4,14 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://139.59.240.233:8546'));
+const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
 const getHashtagItems = require('./tasks/getHashtagItems.js')(web3);
 const estimateGas = require('./tasks/estimateGas.js')(web3);
+const getGasPrice = require('./tasks/getGasPrice.js')(web3);
+const checkApprovalStatus = require('./tasks/checkApprovalStatus.js')(web3);
 const taskFunctions = require('./tasks/index.js');
 
 let connected = [];
@@ -54,13 +56,6 @@ io.on('connection', function(socket) {
 	// 	toDo: tasks._getPendingTransaction,
 	// 	publicKey: user.publicKey,
 	// };
-	const getGasPrice = {
-		nextRun: 0,
-		interval: 0,
-		toDo: tasks._getGasPrice,
-		publicKey: 0,
-		socket: socket,
-	};
 	const getHashtags = {
 		nextRun: 0,
 		interval: 0,
@@ -143,6 +138,28 @@ io.on('connection', function(socket) {
 			});
 		}).catch((err) => {
 			logs._errorLog('estimateGas ERR! ', err);
+		});
+	});
+	socket.on('checkApprovalStatus', (data, response) => {
+    checkApprovalStatus._checkApprovalStatus(data).then((_approvalStatus) => {
+			//socket.emit('estimateGasChanged', res);
+			response({
+				status: 200,
+				approvalStatus: _approvalStatus
+			});
+		}).catch((err) => {
+			logs._errorLog('checkApprovalStatus ERR! ', err);
+		});
+	});
+	socket.on('getGasPrice', (response) => {
+    getGasPrice._getGasPrice().then((gasPrice) => {
+			//socket.emit('estimateGasChanged', res);
+			response({
+				status: 200,
+				gasPrice: gasPrice
+			});
+		}).catch((err) => {
+			logs._errorLog('getGasPrice ERR! ', err);
 		});
 	});
 	socket.on('getNoonce', (data, response) => {

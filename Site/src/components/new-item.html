@@ -136,12 +136,15 @@
             this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
             .then((data) => {
                 const privateKey = data;
-                const message = this.message;
+                const message = "0x34607c9bbfeb9c23509680f04363f298fdb0b5f9abe327304ecd1daca08cda9c";
                 const address = this.keystore.address;
                 const date = Date.now();
                 const location = this.location;
-                const swtvalue = this.swtvalue;
-                return this.$.newitem.newItem(privateKey, message, address, date, location, 10);
+                //const swtvalue = this.swtvalue;
+                const swtvalue =  1200000000000000000;
+                //const hashtagfee = this.hashtagfee;
+                const hashtagfee = 600000000000000000;
+                return this.$.newitem.newItem(privateKey, message, address, date, location, swtvalue, hashtagfee);
             })
             .then((data) => {
                 const signature = data;
