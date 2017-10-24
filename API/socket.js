@@ -35,6 +35,7 @@ io.on('connection', function(socket) {
 
 	logs.info('socket', socket.id, 'connected');
 
+	socket.emit('QUAAK', null);
 
 	let client = {
 		publicKey: socket.handshake.query.publicKey,
