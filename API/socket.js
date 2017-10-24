@@ -5,6 +5,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
+const web3http = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io'));
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
@@ -130,6 +131,7 @@ io.on('connection', function(socket) {
 		});
 	});
   socket.on('estimateGas', (data, response) => {
+		console.log('estimateGas triggered');
     estimateGas._estimateGas(data).then((gasNeeded) => {
 			//socket.emit('estimateGasChanged', res);
 			response({

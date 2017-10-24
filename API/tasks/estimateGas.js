@@ -6,8 +6,8 @@ module.exports = function(web3) {
 		_estimateGas: function(data) {
 			return new Promise((resolve, reject) => {
 
-				console.log(data);
-	
+				//console.log(data);
+
 				var contractInstance = new web3.eth.Contract(minimeContract.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
 
 				contractInstance.methods.approve(data.spender, data.allowance).estimateGas({from: data.from})

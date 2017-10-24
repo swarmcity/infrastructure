@@ -23,21 +23,23 @@
                 return new Promise((resolve, reject) => {
                     if (privateKey && message && address && date && location && swtvalue) {
 
-                        // Let's get the gas price.
-                        socket.emit('getGasPrice', function(gasPrice){
-                          var gasPrice = gasPrice;
-                          console.log("gasprice from API: ", gasPrice);
-                        });
-
                         // Call the api for checkApproval
                         // Here we need to check if the pubkey already has given an allowance
                         var _hashtagAddress = "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6";
                         var _publicKey = window.kf[3].publicKey;
+                        const _privatekey = privateKey;
+                        var dealIdInternal = 'abc';
                         var data = {
+                          //dealIdInternal: dragon.uuid.v4();
+                          dealIdInternal: dealIdInternal,
+                          dealIdExternal: dragon.addHexPrefix(dragon.sha3(dealIdInternal).toString('hex')),
                           hashtagAddress: _hashtagAddress,
                           publicKey: _publicKey,
-                          allowanceNeeded: (hashtagfee / 2) + swtvalue
+                          privateKey: privateKey,
+                          allowanceNeeded: (hashtagfee / 2) + swtvalue,
+                          dealValue: swtvalue
                         };
+
 
                         // Setting up some ingredients
                         var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
@@ -50,30 +52,41 @@
                         // 1: there's an allowance set, but it is not enough to cover this tx
                         // 2: there's an allowance set, and it's enough to cover this tx
 
+                        var self = this;
+
                         socket.emit('checkApprovalStatus', data, function(_approvalStatus){
                           var approvalStatus = _approvalStatus;
-                          console.log("approvalstatus from API: ", approvalStatus);
                           switch (approvalStatus.approvalStatus) {
                             case 0:
-                              console.log('i can make the deal!');
                               // create approval, chain the dealmaking
-                              this.estimateGas(approve).then((gasNeeded) => {
-                                this.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, gasNeeded, gasPrice, from, privateKey).then((txhash) => {
-                                  this.makeDeal(deal).then((txhash) => resolve(txhash));
+                              var approve = {
+                                spender: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                                from: window.kf[3].publicKey,
+                                allowance: data.allowanceNeeded
+                              }
+                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
+                                self.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, gasNeeded, gasPrice, from, privateKey).then((txhash) => {
+                                  self.makeDeal(data).then((txhash) => resolve(txhash));
                                 });
                               });
                               break;
                             case 1:
-                              console.log('the allowance set is not enough');
                               // go to set allowance to zero, than the right amount, then do the dealmaking
                               // Estimate gas for the allowance setting to zero
                               // we need to set it to zero first
                               // https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
-                              this.estimateGas(approve).then((gasNeeded) => {
-                                this.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, gasPrice, from, privateKey).then(()=>{
-                                  this.estimateGas(approve).then((gasNeeded) => {
-                                    this.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, gasPrice, from, privateKey).then(()=>{
-                                      this.makeDeal(deal).then((txhash)=>{ resolve(txhash)}));
+
+                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
+                                self.getGasPrice().then((result)=>{
+                                  self.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, result, window.kf[3].publicKey, privateKey).then(()=>{
+                                    self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
+                                      data.gasPrice = parseInt(result);
+                                      data.gasNeeded = gasNeeded;
+                                      self.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, data.gasNeeded, data.gasPrice, window.kf[3].publicKey, data.privateKey).then(()=>{
+                                        self.makeDeal(data).then((txhash)=>{
+                                          resolve(txhash);
+                                        });
+                                      });
                                     });
                                   });
                                 });
@@ -81,9 +94,8 @@
                               break;
 
                             case 2:
-                              console.log('the allowance set is high enough');
                               // go to dealmaking without allowance
-                              this.makeDeal(deal).then((txhash)=>{ resolve(txhash)}));
+                              this.makeDeal(data).then((txhash)=>{ resolve(txhash) });
                               break;
                             case 3:
                               console.log('an error occured');
@@ -91,14 +103,30 @@
                         });
 
                         //Deliver it to the API
-                        socket.emit('processTx', signedApproveTx);
-                        console.log(signedApproveTx);
-                        resolve(': err? ');
+                        // socket.emit('processTx', signedApproveTx);
+                        // console.log(signedApproveTx);
+                        //resolve(': err? ');
 
                     } else {
                         reject(Error('Missing Arguments'));
                     }
                 });
+            }
+
+
+            /**
+            * getGasPrice returns the current gas price
+            * @return {number} gasprice - The gasprice
+            */
+            getGasPrice() {
+              return new Promise((resolve, reject)=>{
+                // Let's get the gas price.
+                socket.emit('getGasPrice', function(gasPrice){
+                  var gasPrice = gasPrice;
+                  console.log("gasprice from API: ", gasPrice);
+                  resolve(gasPrice.gasPrice);
+                });
+              });
             }
 
             /**
@@ -110,15 +138,18 @@
             */
             estimateGas(_spender, _allowance, _from) {
               return new Promise((resolve, reject)=>{
-                var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-                swtContract.methods.approve(_spender, _allowance).estimateGas({from: _from})
-                .then(function(gasAmount){
-                     var gasNeeded = gasAmount;
-                     resolve(gasNeeded);
-                 }).catch(function(error){
-                     console.log('error in gasamaount');
-                     reject(Error('Missing Arguments'));
-                 });
+                //var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                //swtContract.methods.approve(_spender, _allowance).estimateGas({from: _from})
+                var data = {
+                  spender: _spender,
+                  from: _from,
+                  allowance: _allowance
+                };
+                socket.emit('estimateGas', data, function(_gasNeeded){
+                  var gasNeeded = _gasNeeded.gasNeeded;
+                  console.log("estimategas from API: ", gasNeeded);
+                  resolve(gasNeeded);
+                });
               });
             }
 
@@ -130,23 +161,24 @@
             makeDeal(_deal) {
               return new Promise((resolve, reject) => {
                 var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
-                var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
+                var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo(_deal.dealIdExternal, _deal.dealValue, "ipfshash").encodeABI();
 
                 const rawTx = {
-                  to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                  nonce: window.kf[3].nonce++,
+                  to: _deal.hashtagAddress,
                   data: encodedSimpleDealTx,
-                  gasPrice: gasPrice,
-                  gasNeeded: "SPONNETKNOWS"
+                  gasPrice: _deal.gasPrice,
+                  gasLimit: 300009
                 };
 
                 var tx = new dragon.Transaction(rawTx);
-                tx.sign(_privatekey);
+                tx.sign(_deal.privateKey);
+
                 var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
+                // emit it to the api > processTx
                 resolve(serializedtx);
-              } else {
-                reject(Error('Missing arguments'));
-              });
-            }
+            });
+          }
 
             /**
             * approveTx creates the actual deal
@@ -154,25 +186,35 @@
             * @param {string} spender - The final signature starting with 0x
             * @param {number} allowance - The amount of swt tokens to be allowed / in smallest 1e18
             * @param {string} from - The public key
+            * @param {number} gasNeeded - The public key
+            * @param {number} gasPrice - The public key
             */
             approveTx(_spender, _allowance, _gasNeeded, _gasPrice, _from, _privatekey) {
               return new Promise((resolve, reject) => {
                 var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-                var encodedtx = swtContract.methods.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).encodeABI();
+
+                var encodedtx = swtContract.methods.approve(_spender, _allowance).encodeABI();
+                var gasPrice = parseInt(_gasPrice);
+
                 const rawTx = {
+                  from: "0x5263261bAD400DEf63AF145270B2bD144ec64E14",
+                  nonce: 452,
                   to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
                   data: encodedtx,
-                  gasPrice: _gasPrice,
-                  gasNeeded: _gasNeeded
+                  gasPrice: gasPrice,
+                  gasLimit: 6722217
                 };
+
                 var approvetx = new dragon.Transaction(rawTx);
+
                 approvetx.sign(_privatekey);
                 var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
+                console.log('---> first inject the approve tx ', signedApproveTx);
+                debugger;
                 resolve(signedApproveTx);
-              } else {
-                reject(Error('Missing arguments'));
               });
             }
+
 
             /**
             * verify a signed message
