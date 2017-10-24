@@ -39,6 +39,12 @@
                           allowanceNeeded: (hashtagfee / 2) + swtvalue
                         };
 
+                        // Setting up some ingredients
+                        var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+
+                        // [kf] @will this is shit code but i just want to make dealmaking work in a first frontend iteration
+
                         // The socket gets the approvalStatus back.
                         // 0: everything okay, no allowance found
                         // 1: there's an allowance set, but it is not enough to cover this tx
@@ -50,100 +56,122 @@
                           switch (approvalStatus.approvalStatus) {
                             case 0:
                               console.log('i can make the deal!');
+                              // create approval, chain the dealmaking
+                              this.estimateGas(approve).then((gasNeeded) => {
+                                this.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, gasNeeded, gasPrice, from, privateKey).then((txhash) => {
+                                  this.makeDeal(deal).then((txhash) => resolve(txhash));
+                                });
+                              });
                               break;
                             case 1:
                               console.log('the allowance set is not enough');
+                              // go to set allowance to zero, than the right amount, then do the dealmaking
+                              // Estimate gas for the allowance setting to zero
+                              // we need to set it to zero first
+                              // https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
+                              this.estimateGas(approve).then((gasNeeded) => {
+                                this.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, gasPrice, from, privateKey).then(()=>{
+                                  this.estimateGas(approve).then((gasNeeded) => {
+                                    this.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, gasPrice, from, privateKey).then(()=>{
+                                      this.makeDeal(deal).then((txhash)=>{ resolve(txhash)}));
+                                    });
+                                  });
+                                });
+                              });
                               break;
+
                             case 2:
                               console.log('the allowance set is high enough');
+                              // go to dealmaking without allowance
+                              this.makeDeal(deal).then((txhash)=>{ resolve(txhash)}));
                               break;
                             case 3:
                               console.log('an error occured');
                           }
-
-                          // We can put all this logic on the worker node too. The approvalstatus could just respond with a status
-                          // if approval comes back with an existing allowance,
-                          // we need to check if the allowance is large enough to do the tx.
-                          // large enough means "bigger or equal than the dealvalue + hashtagfee"
-                          // If not, we need to first chain the tx to set the allowance to 0
-                          // Then we give a new, correct allowance.
-                          // If approval comes back with 0 allowance, we set the allowance
-                          // and chain the dealmaking tx.
-                            // if approval is 0
-                              // create approval, chain the dealmaking
-                            // if approval is not 0
-                              // Check if its enough for the deal. If yes,
-                                // go to dealmaking
-                              // if no,
-                              // create approval, chain the dealmaking.
                         });
 
-
-
-                        // Then we can estimategas for approve on the SWT contract
-                        // var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-                        // swtContract.methods.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).estimateGas({from: window.kf[3].publicKey})
-                        // .then(function(gasAmount){
-                        //      var gasNeeded = gasAmount;
-                        //  }).catch(function(error){
-                        //      console.log('error in gasamaount');
-                        //  });
-
-                        // var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
-
-                        // var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
-
-                        // const rawTx = {
-                        //   to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                        //   data: encodedSimpleDealTx,
-                        // };
-
-                        // var tx = new dragon.Transaction(rawTx);
-                        // var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
-
-                        // Call the api for estimateGas
-                        // data.publicKey
-                        // data.extradata
-                        // const getGasPriceData = {
-                        //   hashtagAddress: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                        //   extraData: serializedtx,
-                        //   publicKey: window.kf[3].publicKey,
-                        //   dealValue: 600000000000000000
-                        // }
-
-                        // socket.emit('estimateGas', getGasPriceData, function(gasNeeded){
-                        //   var gasNeeded = gasNeeded;
-                        //   console.log("gasneeded from API: ", gasNeeded);
-                        // });
-
-
-
-                        // const approveRawTx = {
-                        //   nonce: 10,
-                        //   gasPrice: window.gasPrice,
-                        //   gasLimit: gasNeeded,
-                        //   to: "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607",
-                        //   value: "600000000000000000",
-                        //   data: serializedtx,
-                        //   chainId: 1
-                        // };
-
-                        // var approvetx = new dragon.Transaction(approveRawTx);
-
-                        // approvetx.sign(privateKey);
-                        // var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
-
-                        // Deliver it to the API
-                        //socket.emit('processTx', signedApproveTx);
-                        // Then we get the txhash back from the API, indicating the successful injection
-                        //var txHash = "0x000";
-
-                        resolve("signedApproveTx");
+                        //Deliver it to the API
+                        socket.emit('processTx', signedApproveTx);
+                        console.log(signedApproveTx);
+                        resolve(': err? ');
 
                     } else {
                         reject(Error('Missing Arguments'));
                     }
                 });
+            }
+
+            /**
+            * estimateGas price for an approve call
+            * @return {number} gasNeeded - The amount of gas needed to execute the tx / in wei
+            * @param {string} spender - The final signature starting with 0x
+            * @param {number} allowance - The amount of swt tokens to be allowed / in smallest 1e18
+            * @param {string} from - The public key
+            */
+            estimateGas(_spender, _allowance, _from) {
+              return new Promise((resolve, reject)=>{
+                var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                swtContract.methods.approve(_spender, _allowance).estimateGas({from: _from})
+                .then(function(gasAmount){
+                     var gasNeeded = gasAmount;
+                     resolve(gasNeeded);
+                 }).catch(function(error){
+                     console.log('error in gasamaount');
+                     reject(Error('Missing Arguments'));
+                 });
+              });
+            }
+
+            /**
+            * makeDeal creates the actual deal
+            * @return {string} txHash - The tx hash
+            * @param {object} deal - The dealobject
+            */
+            makeDeal(_deal) {
+              return new Promise((resolve, reject) => {
+                var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+                var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo("0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45", 600000000000000000, "ipfshash").encodeABI();
+
+                const rawTx = {
+                  to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                  data: encodedSimpleDealTx,
+                  gasPrice: gasPrice,
+                  gasNeeded: "SPONNETKNOWS"
+                };
+
+                var tx = new dragon.Transaction(rawTx);
+                tx.sign(_privatekey);
+                var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
+                resolve(serializedtx);
+              } else {
+                reject(Error('Missing arguments'));
+              });
+            }
+
+            /**
+            * approveTx creates the actual deal
+            * @return {string} txHash - The signedtx
+            * @param {string} spender - The final signature starting with 0x
+            * @param {number} allowance - The amount of swt tokens to be allowed / in smallest 1e18
+            * @param {string} from - The public key
+            */
+            approveTx(_spender, _allowance, _gasNeeded, _gasPrice, _from, _privatekey) {
+              return new Promise((resolve, reject) => {
+                var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                var encodedtx = swtContract.methods.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 1200000000000000000, serializedtx).encodeABI();
+                const rawTx = {
+                  to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                  data: encodedtx,
+                  gasPrice: _gasPrice,
+                  gasNeeded: _gasNeeded
+                };
+                var approvetx = new dragon.Transaction(rawTx);
+                approvetx.sign(_privatekey);
+                var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
+                resolve(signedApproveTx);
+              } else {
+                reject(Error('Missing arguments'));
+              });
             }
 
             /**
@@ -166,6 +194,8 @@
                     }
                 });
             }
+
+
         } window.customElements.define(FunctionNewItem.is, FunctionNewItem);
     </script>
 </dom-module>
