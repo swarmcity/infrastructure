@@ -1,8 +1,12 @@
+'use strict';
+
+const logger = require('../logs')();
+
 module.exports = function(web3) {
 	const request = require('request');
 	let result;
 	return ({
-		_updateFx: function() {
+		updateFx: function() {
 			return new Promise((resolve, reject) => {
 				request('https://api.coinmarketcap.com/v1/ticker/swarm-city/?convert=EUR',
 				(error, response, body) => {
@@ -16,11 +20,12 @@ module.exports = function(web3) {
 						price_usd: parsedBody[0].price_usd,
 						symbol: parsedBody[0].symbol,
 					};
+					logger.info('updateFx result=',result);
 					resolve(result);
 				});
 			});
 		},
-		_getFx: function() {
+		getFx: function() {
 			return new Promise((resolve, reject) => {
 				resolve(result || this._updateFx());
 			});

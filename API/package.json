@@ -10,10 +10,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.5.0",
+    "dotenv": "^4.0.0",
     "express": "^4.15.3",
+    "queue": "^4.4.1",
     "request": "^2.83.0",
     "socket.io": "^2.0.3",
-    "web3": "^1.0.0-beta.22"
+    "web3": "^1.0.0-beta.22",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "eslint": "^4.9.0",

@@ -5,7 +5,11 @@ module.exports = function(web3) {
 		 * @param {String} address - The user's pub key
 		 * @return {Array} - Balances of that user
 		 */
-		_getBalance: function(address) {
+		getBalance: function(data) {
+
+			console.log('getBalance address=',data.address);
+
+
 			return new Promise((resolve, reject) => {
 				let promisesList = [];
 				const minimeContract = require('../contracts/miniMeToken.json');
@@ -16,22 +20,22 @@ module.exports = function(web3) {
 						minimeContract.abi,
 						tokenIndex[token]
 					);
-					promisesList.push(tokenContract.methods.balanceOf(address).call()
+					promisesList.push(tokenContract.methods.balanceOf(data.address).call()
 					.then((res) => {
 						return {
 							balance: res,
-							publicKey: address,
+							publicKey: data.address,
 							tokenSymbol: token,
 							tokenContractAddress: tokenIndex[token],
 
 						};
 					}));
 				});
-				promisesList.push(web3.eth.getBalance(address)
+				promisesList.push(web3.eth.getBalance(data.address)
 				.then((res) => {
 					return {
 						balance: res,
-						publicKey: address,
+						publicKey: data.address,
 						tokenSymbol: 'ETH',
 						tokenContractAddress: '0x0',
 					};
