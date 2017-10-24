@@ -6,18 +6,17 @@ const logger = require('../logs')();
 // worker queue is the worker queue for tasks that need to run NOW
 
 module.exports = function(config) {
-
 	if (!config) {
 		config = {};
 	}
 
 	// create a queue object with default concurrency 2
-	var q = queue((task, callback) => {
+	let q = queue((task, callback) => {
 		task.func(task).then((res) => {
 			callback(res, task);
 		}).catch((err) => {
-			logger.error('workerqueue error',err);
-			callback(null, task);			
+			logger.error('workerqueue error', err);
+			callback(null, task);
 		});
 	}, config.concurrency || 2);
 
@@ -30,6 +29,6 @@ module.exports = function(config) {
 
 	return ({
 		scheduledTask: scheduledTask,
-		blockheaderTask: blockheaderTask
+		blockheaderTask: blockheaderTask,
 	});
 };

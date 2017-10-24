@@ -1,6 +1,6 @@
 'use strict';
 require('dotenv').config({
-	path: '../.env'
+	path: '../.env',
 });
 const app = require('express')();
 const server = require('http').Server(app); // eslint-disable-line
@@ -20,14 +20,13 @@ const getBalance = require('./tasks/getBalance.js')(web3);
 let connectedSockets = {};
 
 (function() {
-	let myTask = workerQueue.scheduledTask.addTask({
+	workerQueue.scheduledTask.addTask({
 		func: getFx.updateFx,
-		interval: 60 * 1000
+		interval: 60 * 1000,
 	});
 })();
 
 io.on('connection', function(socket) {
-
 	if (!socket.handshake.query.publicKey) {
 		logs._errorLog('no pubkey given.');
 		return socket.disconnect(true);
@@ -40,12 +39,12 @@ io.on('connection', function(socket) {
 	let client = {
 		publicKey: socket.handshake.query.publicKey,
 		socket: socket,
-		scheduledtasks: []
+		scheduledtasks: [],
 	};
 
 	connectedSockets[socket.id] = client;
 
-	var task = workerQueue.scheduledTask.addTask({
+	let task = workerQueue.scheduledTask.addTask({
 		func: (task) => {
 			return getBalance.getBalance(task.data);
 		},
@@ -56,13 +55,13 @@ io.on('connection', function(socket) {
 		data: {
 			socket: socket,
 			address: socket.handshake.query.publicKey,
-		}
+		},
 	});
 
 	client.scheduledtasks.push(task);
 
 
-	var task2 = workerQueue.scheduledTask.addTask({
+	let task2 = workerQueue.scheduledTask.addTask({
 		func: (task) => {
 			return getFx.updateFx();
 		},
@@ -73,7 +72,7 @@ io.on('connection', function(socket) {
 		data: {
 			socket: socket,
 			address: socket.handshake.query.publicKey,
-		}
+		},
 	});
 
 	client.scheduledtasks.push(task2);
@@ -175,6 +174,9 @@ io.on('connection', function(socket) {
 	// });
 });
 
-const PORT = 8011;
+const PORT = process.env.APISOCKETPORT;
 const HOST = '0.0.0.0';
+
+logs.info('server listening on host ', HOST, 'port', PORT);
+
 server.listen(PORT, HOST);

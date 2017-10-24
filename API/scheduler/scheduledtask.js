@@ -3,10 +3,9 @@
 // Scheduled tasks are tasks that need to run any time in the future , or right now.
 
 module.exports = function(workerqueue) {
-
-	var tasks = [];
-	var nextTaskTimer;
-	var nextRun;
+	let tasks = [];
+	let nextTaskTimer;
+	let nextRun;
 
 	return ({
 		/**
@@ -17,7 +16,6 @@ module.exports = function(workerqueue) {
 		 * - sleep
 		 */
 		_updateSchedule: function() {
-
 			tasks.sort((a, b) => {
 				return a.nextRun - b.nextRun;
 			});
@@ -25,13 +23,13 @@ module.exports = function(workerqueue) {
 			let now = (new Date).getTime();
 			while (tasks[0] && tasks[0].nextRun <= now) {
 				let task = tasks.shift();
-				workerqueue.push(task, task.responsehandler || function(){});
+				workerqueue.push(task, task.responsehandler || function() {});
 			}
 
 			clearTimeout(nextTaskTimer);
 			this.nextRun = null;
 
-			var due = 0;
+			let due = 0;
 			if (tasks[0]) {
 				due = tasks[0].nextRun - now;
 				if (due > 0) {
@@ -50,28 +48,27 @@ module.exports = function(workerqueue) {
 		 * @param {object} options - task description
 		 * nextRun : unix timestamp ( milliseconds ) when task needs to run
 		 * func : work function , runs with (task) - returns a Promise
-		 * responsehandler : when func resolves, runs this function with (res,task) - returns a Promise
+		 * responsehandler : when func resolves, runs this function 
+		 * with (res,task) - returns a Promise
 		 * interval : when responsehandler is not available - auto-reschedule at this interval
 		 * data: initial state data for func
 		 * @return {object} - task that is scheduled.
 		 */
 		addTask: function(options) {
-
 			let task = {
 				nextRun: options.nextRun || 0,
 				func: options.func,
 				responsehandler: options.responsehandler,
-				data: options.data
+				data: options.data,
 			};
-			var self = this;
 
-			if (!options.responsehandler && options.interval){
-				task.responsehandler = function(res,task){
-					self.addTask({
+			if (!options.responsehandler && options.interval) {
+				task.responsehandler = (res, task) => {
+					this.addTask({
 						nextRun: (new Date).getTime() + options.interval,
-						func : task.func,
+						func: task.func,
 						data: task.data,
-						responsehandler: task.responsehandler
+						responsehandler: task.responsehandler,
 					});
 				};
 			}
@@ -95,12 +92,12 @@ module.exports = function(workerqueue) {
 		},
 
 		removeTasks: function(taskArray) {
-			for (let i=0;i<taskArray.length;i++){
+			for (let i = 0; i < taskArray.length; i++) {
 				this.removeTask(taskArray[i]);
-			}			
+			}
 		},
 
 		tasks: tasks,
-		nextRun: nextRun
+		nextRun: nextRun,
 	});
 };

@@ -7,34 +7,31 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
 
 module.exports = function(workerqueue) {
-
-	var tasks = [];
+	let tasks = [];
 
 	web3.eth.subscribe('newBlockHeaders', (error, result) => {
 		logger.info('newBlockHeaders event occured');
-		var task;
+		let task;
 		while (task = tasks.shift()) {
 			workerqueue.push(task, task.responsehandler);
 		}
 	});
 
 	return ({
-
-
 		/**
 		 * addTask
 		 * @param {object} options - task description
 		 * func : work function , runs with (task) - returns a Promise
-		 * responsehandler : when func resolves, runs this function with (res,task) - returns a Promise
+		 * responsehandler : when func resolves, runs this function 
+		 * with (res,task) - returns a Promise
 		 * data: initial state data for func
 		 * @return {object} - task that is waiting for the next block.
 		 */
 		addTask: function(options) {
-
 			let task = {
 				func: options.func,
 				responsehandler: options.responsehandler,
-				data: options.data
+				data: options.data,
 			};
 
 			tasks.push(task);
