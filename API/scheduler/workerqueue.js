@@ -12,7 +12,7 @@ module.exports = function(config) {
 	}
 
 	// create a queue object with default concurrency 2
-	var q = queue(function(task, callback) {
+	var q = queue((task, callback) => {
 		task.func(task).then((res) => {
 			callback(res, task);
 		}).catch((err) => {
@@ -24,7 +24,7 @@ module.exports = function(config) {
 	const scheduledTask = require('./scheduledtask')(q);
 	const blockheaderTask = require('./blockheadertask')(q);
 
-	q.drain = function() {
+	q.drain = () => {
 		logger.debug('all items have been processed');
 	};
 

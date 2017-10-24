@@ -1,6 +1,7 @@
 'use strict';
 
 // Scheduled tasks are tasks that need to run when the next ETH block arrives.
+
 const logger = require('../logs')();
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
@@ -51,7 +52,7 @@ module.exports = function(workerqueue) {
 				tasks.splice(index, 1);
 			}
 		},
-		
+
 		removeTasks: function(taskArray) {
 			for (let i = 0; i < taskArray.length; i++) {
 				this.removeTask(taskArray[i]);

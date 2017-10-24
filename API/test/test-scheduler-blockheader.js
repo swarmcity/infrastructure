@@ -1,3 +1,5 @@
+'use strict';
+require('dotenv').config({path: '../../.env'});
 const workerQueue = require('../scheduler/workerqueue')();
 
 describe('Swarm City scheduler', function() {

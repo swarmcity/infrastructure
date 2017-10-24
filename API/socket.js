@@ -1,5 +1,7 @@
 'use strict';
-require('dotenv').config({path: '../.env'});
+require('dotenv').config({
+	path: '../.env'
+});
 const app = require('express')();
 const server = require('http').Server(app); // eslint-disable-line
 const io = require('socket.io')(server);
@@ -15,16 +17,13 @@ const getFx = require('./tasks/getFx.js')(web3);
 // socket task handlers
 const getBalance = require('./tasks/getBalance.js')(web3);
 
-
 let connectedSockets = {};
 
 (function() {
-
-	let myTask = workerQueue.scheduledtask.addTask({
+	let myTask = workerQueue.scheduledTask.addTask({
 		func: getFx.updateFx,
 		interval: 60 * 1000
 	});
-
 })();
 
 io.on('connection', function(socket) {
@@ -34,6 +33,9 @@ io.on('connection', function(socket) {
 		return socket.disconnect(true);
 	}
 
+	logs.info('socket', socket.id, 'connected');
+
+
 	let client = {
 		publicKey: socket.handshake.query.publicKey,
 		socket: socket,
@@ -42,14 +44,13 @@ io.on('connection', function(socket) {
 
 	connectedSockets[socket.id] = client;
 
-	var task = workerQueue.scheduledtask.addTask({
+	var task = workerQueue.scheduledTask.addTask({
 		func: (task) => {
 			return getBalance.getBalance(task.data);
 		},
 		responsehandler: (res, task) => {
-			logs.info('received RES=',res);
-			//logs.info('task=',task);
-			return task.data.socket.emit('balanceChanged', res);
+			logs.info('received RES=', JSON.stringify(res, null, 4));
+			task.data.socket.emit('balanceChanged', res);
 		},
 		data: {
 			socket: socket,
@@ -59,6 +60,22 @@ io.on('connection', function(socket) {
 
 	client.scheduledtasks.push(task);
 
+
+	var task2 = workerQueue.scheduledTask.addTask({
+		func: (task) => {
+			return getFx.updateFx();
+		},
+		responsehandler: (res, task) => {
+			logs.info('received getFx RES=', JSON.stringify(res, null, 4));
+			task.data.socket.emit('fxChanged', res);
+		},
+		data: {
+			socket: socket,
+			address: socket.handshake.query.publicKey,
+		}
+	});
+
+	client.scheduledtasks.push(task2);
 
 	// const getBalance = {
 	// 	nextRun: 0,
@@ -100,7 +117,8 @@ io.on('connection', function(socket) {
 	// _queue(getFx, 'add');
 
 	socket.on('disconnect', () => {
-		workerQueue.scheduledtask.removeTasks(connectedSockets[socket.id].scheduledtasks);
+		logs.info('socket', socket.id, 'disconnected');
+		workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledtasks);
 		delete connectedSockets[socket.id];
 	});
 

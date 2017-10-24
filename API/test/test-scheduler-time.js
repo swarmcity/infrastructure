@@ -9,7 +9,6 @@ describe('Swarm City scheduler', function() {
 		let myTask = workerQueue.scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 1000,
 			func: hello,
-			//responsehandler: responseHandler,
 			interval : 1000,
 			data: 'a'
 		});
