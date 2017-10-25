@@ -3,7 +3,7 @@ require('dotenv').config({
 	path: '../.env',
 });
 const app = require('express')();
-const server = require('http').Server(app); // eslint-disable-line
+const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
@@ -109,101 +109,11 @@ io.on('connection', (socket) => {
 		})
 	);
 
-	// const getBalance = {
-	// 	nextRun: 0,
-	// 	interval: 0,
-	// 	toDo: tasks._getBalance,
-	// 	publicKey: user.publicKey,
-	// 	socket: socket,
-	// };
-	// const getPendingTransactions = {
-	// 	nextRun: 0,
-	// 	interval: 0,
-	// 	toDo: tasks._getPendingTransaction,
-	// 	publicKey: user.publicKey,
-	// };
-	// const getGasPrice = {
-	// 	nextRun: 0,
-	// 	interval: 0,
-	// 	toDo: tasks._getGasPrice,
-	// 	publicKey: 0,
-	// 	socket: socket,
-	// };
-	// const getHashtags = {
-	// 	nextRun: 0,
-	// 	interval: 0,
-	// 	toDo: tasks._getHashtags,
-	// 	publicKey: 0,
-	// 	socket: socket,
-	// };
-	// const getFx = {
-	// 	nextRun: 0,
-	// 	interval: 0,
-	// 	toDo: tasks._getFx,
-	// 	publicKey: 0,
-	// 	socket: socket,
-	// };
-	// _queue(getHashtags, 'add');
-	// _queue(getGasPrice, 'add');
-	// _queue(getBalance, 'add');
-	// _queue(getFx, 'add');
-
 	socket.on('disconnect', () => {
 		logs.info('socket', socket.id, 'disconnected');
 		workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledTasks);
 		delete connectedSockets[socket.id];
 	});
-
-	// socket.on('requests', (data, response) => {
-	// 	response({
-	// 		status: 200,
-	// 	});
-	// });
-
-	// socket.on('createItem', (data, response) => {
-	// 	return newItem._newItem(data).then((res) => {
-	// 		socket.emit('newItemChanged', res);
-	// 		response({
-	// 			status: 200,
-	// 			res,
-	// 		});
-	// 	}).catch((err) => {
-	// 		logs._errorLog('newItem ERR! ', err);
-	// 	});
-	// });
-
-	// socket.on('hashtagItems', (data, response) => {
-	// 	return getHashtagItems._getHashtagItems(data).then((res) => {
-	// 		socket.emit('hashtagItemsChanged', res);
-	// 		response({
-	// 			status: 200,
-	// 			res,
-	// 		});
-	// 	}).catch((err) => {
-	// 		logs._errorLog('hashtagItems ERR! ', err);
-	// 	});
-	// });
-
-	// socket.on('broadcastTransaction', (data, response) => {
-	// 	response({
-	// 		status: 200,
-	// 	});
-	// });
-	// socket.on('saveAvatar', (data, response) => {
-	// 	response({
-	// 		status: 200,
-	// 	});
-	// });
-	// socket.on('getNoonce', (data, response) => {
-	// 	response({
-	// 		status: 200,
-	// 	});
-	// });
-	// socket.on('saveError', (data, response) => {
-	// 	response({
-	// 		status: 200,
-	// 	});
-	// });
 });
 
 const PORT = process.env.APISOCKETPORT;
