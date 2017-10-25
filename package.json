@@ -35,5 +35,8 @@
   "bugs": {
     "url": "https://github.com/DragonSystems/DragonSystem/issues"
   },
-  "homepage": "https://github.com/DragonSystems/DragonSystem#readme"
+  "homepage": "https://github.com/DragonSystems/DragonSystem#readme",
+  "devDependencies": {
+    "eslint-config-google": "^0.9.1"
+  }
 }

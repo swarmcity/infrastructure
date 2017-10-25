@@ -1,11 +1,13 @@
+'use strict';
+
 module.exports = function(web3) {
 	return ({
 		/**
 		 * Get Balance
-		 * @param {String} address - The user's pub key
+		 * @param {object} data - { address: <The user's pub key> }
 		 * @return {Array} - Balances of that user
 		 */
-		_getBalance: function(address) {
+		getBalance: function(data) {
 			return new Promise((resolve, reject) => {
 				let promisesList = [];
 				const minimeContract = require('../contracts/miniMeToken.json');
@@ -16,26 +18,26 @@ module.exports = function(web3) {
 						minimeContract.abi,
 						tokenIndex[token]
 					);
-					promisesList.push(tokenContract.methods.balanceOf(address).call()
+					promisesList.push(tokenContract.methods.balanceOf(data.address).call()
+						.then((res) => {
+							return {
+								balance: res,
+								publicKey: data.address,
+								tokenSymbol: token,
+								tokenContractAddress: tokenIndex[token],
+
+							};
+						}));
+				});
+				promisesList.push(web3.eth.getBalance(data.address)
 					.then((res) => {
 						return {
 							balance: res,
-							publicKey: address,
-							tokenSymbol: token,
-							tokenContractAddress: tokenIndex[token],
-
+							publicKey: data.address,
+							tokenSymbol: 'ETH',
+							tokenContractAddress: '0x0',
 						};
 					}));
-				});
-				promisesList.push(web3.eth.getBalance(address)
-				.then((res) => {
-					return {
-						balance: res,
-						publicKey: address,
-						tokenSymbol: 'ETH',
-						tokenContractAddress: '0x0',
-					};
-				}));
 				resolve(Promise.all(promisesList));
 			});
 		},
