@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
 	client.scheduledTasks.push(
 		workerQueue.scheduledTask.addTask({
 			func: (task) => {
-				return getFx.updateFx();
+				return getFx.getFx();
 			},
 			responsehandler: (res, task) => {
 				logs.info('received getFx RES=', JSON.stringify(res, null, 4));

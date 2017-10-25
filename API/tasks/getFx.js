@@ -6,7 +6,7 @@ module.exports = function(web3) {
 	const request = require('request');
 	let result;
 	return ({
-		updateFx: () => {
+		updateFx: function() {
 			return new Promise((resolve, reject) => {
 				request('https://api.coinmarketcap.com/v1/ticker/swarm-city/?convert=EUR',
 					(error, response, body) => {
@@ -25,9 +25,9 @@ module.exports = function(web3) {
 					});
 			});
 		},
-		getFx: () => {
+		getFx: function() {
 			return new Promise((resolve, reject) => {
-				resolve(result || this._updateFx());
+				resolve(result || this.updateFx());
 			});
 		},
 	});
