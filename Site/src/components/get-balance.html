@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux-state.html">
+
+<dom-module id="get-balance">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+
+        <div class="container">
+            <h1>Balance</h1>
+            <p><b>The latest fx rates are:</b></p>
+            <hr>
+        </div>
+
+        <template is="dom-repeat" items="{{balance}}">
+                <div>Token Symbol: {{item.tokenSymbol}}</div>
+                <div>Balance: {{item.balance}}</div>
+                <div>Public Key: {{item.publicKey}}</div>
+                <div>Token Contract Address: {{item.tokenContractAddress}}</div>
+                <hr>
+            </template>
+
+    </template>
+    <script>
+
+        class GetBalance extends new ReduxMixin(Polymer.Element) {
+            static get is() {
+                return 'get-balance';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * hashtags represents the list of hashtags
+                    * @type {Object}
+                    */
+                    balance: {
+                        type: Array,
+                        statePath: 'balance',
+                    },
+                };
+            }
+        } window.customElements.define(GetBalance.is, GetBalance);
+    </script>
+</dom-module>
+

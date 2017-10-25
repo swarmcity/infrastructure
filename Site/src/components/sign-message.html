@@ -106,46 +106,42 @@
                     this.error = error;
                 };
         }
-
-        _checkPassword(){
-            if(this.password.length >= 10){
+        _checkPassword() {
+            if (this.password.length >= 10) {
                 this.disabled = false;
             } else {
                 this.disabled = true;
             }
         }
-        _signMessage(keystore){
+        _signMessage(keystore) {
             this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
             .then((data) => {
                 const privateKey = data;
                 const message = this.message;
                 const address = this.keystore.address;
                 const date = this._makeDate();
-                return this.$.message.signMessage(privateKey, message, address, date)
+                return this.$.message.signMessage(privateKey, message, address, date);
             })
             .then((data) => {
-                const signature = data
+                const signature = data;
                 this.signature = signature;
                 this.signedMessage = true;
-            })
+            });
         }
-        _makeDate(){
+        _makeDate() {
             var today = new Date();
             var dd = today.getDate();
-            var mm = today.getMonth()+1; 
+            var mm = today.getMonth()+1;
             var yyyy = today.getFullYear();
-            if(dd<10) {
-                dd = '0'+dd
-            } 
-            if(mm<10) {
-                mm = '0'+mm
-            } 
+            if (dd<10) {
+                dd = '0'+dd;
+            }
+            if (mm<10) {
+                mm = '0'+mm;
+            }
             today = mm + '/' + dd + '/' + yyyy;
             return today;
         }
-        
-
-
         } window.customElements.define(SignMessage.is, SignMessage);
     </script>
 </dom-module>

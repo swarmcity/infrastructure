@@ -4,13 +4,20 @@
   "description": "",
   "main": "socket.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --timeout 10000 test/*",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.3",
+    "request": "^2.83.0",
     "socket.io": "^2.0.3",
     "web3": "^1.0.0-beta.22"
+  },
+  "devDependencies": {
+    "eslint": "^4.9.0",
+    "eslint-config-google": "^0.9.1",
+    "should": "^13.1.2"
   }
 }

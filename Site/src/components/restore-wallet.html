@@ -100,17 +100,17 @@
             }
 
             _restoreWallet() {
-                if(this.password){
+                if (this.password) {
                     this.statePassword = false;
                     this.stateDownload = true;
                     this.$.wallet.restoreKey(this.privateKey, this.password)
                     .then((data) => {
                         this.wallet = data;
-                        localStorage.setItem("utcKeystore", JSON.stringify(data.utcKeystore));
-                    })
+                        localStorage.setItem('utcKeystore', JSON.stringify(data.utcKeystore));
+                    });
                 }
             }
-            _download(){
+            _download() {
                 const filename = this.wallet.fileName;
                 const text = JSON.stringify(this.wallet.utcKeystore);
                 const element = document.createElement('a');
@@ -122,12 +122,12 @@
                 document.body.removeChild(element);
                 this.disabled = false;
             }
-            _continue(){
+            _continue() {
                 this.stateDownload = false;
                 this.stateSaveKey = true;
-                this.privateKey = this.wallet.privateKey
+                this.privateKey = this.wallet.privateKey;
             }
-            _print(){
+            _print() {
                 this.$.wallet.makeQRCode(this.wallet.address)
                 .then((addressQR) => {
                         this.addressQR = addressQR;
@@ -137,15 +137,12 @@
                         this.privateKeyQR = privateKeyQR;
                 })
                 .then(() => {
-                    var myWindow = window.open("", "MsgWindow", "width=800,height=600", "_blank");
-                    myWindow.document.write("<title>Print Paper Wallet</title><img src='"+this.addressQR+"' class='address'><p>Your Ethereum Address: "+this.wallet.address+"</p><img src='"+this.privateKeyQR+"' class='private-key'><p>Your Private Key: "+this.wallet.privateKey+"</p>");
-                    setTimeout(function () { myWindow.print(); }, 200);
-                    myWindow.onfocus = function () { setTimeout(function () { myWindow.close(); }, 200); }
-                })
-                
+                    var myWindow = window.open('', 'MsgWindow', 'width=800,height=600', '_blank');
+                    myWindow.document.write("<title>Print Paper Wallet</title><img src='"+this.addressQR+"' class='address'><p>Your Ethereum Address: "+this.wallet.address+"</p><img src='"+this.privateKeyQR+"' class='private-key'><p>Your Private Key: "+this.wallet.privateKey+"</p>"); // eslint-disable-line
+                    setTimeout(function() {myWindow.print();}, 200);
+                    myWindow.onfocus = function() {setTimeout(function() {myWindow.close();}, 200);};
+                });
             }
-
         } window.customElements.define(RestoreWallet.is, RestoreWallet);
     </script>
 </dom-module>
-

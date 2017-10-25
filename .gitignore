@@ -5,3 +5,4 @@ data/
 DragonSite/bower_components/
 DragonSite/build/
 npm-debug.log
+Store/package-lock.json

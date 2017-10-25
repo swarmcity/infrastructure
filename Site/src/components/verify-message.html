@@ -52,16 +52,15 @@
                 };
             }
 
-        _verifyMessage(){
+        _verifyMessage() {
             const signedMessage = JSON.parse(this.signedMessage);
             this.$.message.verifyMessage(signedMessage.signature, signedMessage.message)
             .then((data) => {
-                if(data.toLowerCase() === signedMessage.address.toLowerCase()){
+                if (data.toLowerCase() === signedMessage.address.toLowerCase()) {
                     this.messageVerified = true;
                 }
-            })
+            });
         }
-
         } window.customElements.define(VerifyMessage.is, VerifyMessage);
     </script>
 </dom-module>

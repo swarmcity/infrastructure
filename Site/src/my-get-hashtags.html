@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/get-hashtags.html">
+
+<dom-module id="my-get-hashtags">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <get-hashtags></get-hashtags>
+    </div>
+  </template>
+<script>
+
+    class MyGetHashtags extends Polymer.Element {
+        static get is() {return 'my-get-hashtags';
+    }
+    } window.customElements.define(MyGetHashtags.is, MyGetHashtags);
+  </script>
+</dom-module>

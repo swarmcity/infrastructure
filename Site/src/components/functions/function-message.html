@@ -13,54 +13,52 @@
             * @param {string} message - The message to be signed
             * @param {string} address - The address associated with the private key
             * @param {string} date - The date to append to the message
-            * @returns {object} 
+            * @return {object} 
             */
             signMessage(privateKey, message, address, date) {
                 return new Promise((resolve, reject) => {
-                    if(privateKey && message && address && date){
+                    if (privateKey && message && address && date) {
                         const Buffer = dragon.Buffer.Buffer;
                         const hash = dragon.sha3(message + ' ' + date);
                         const signed = dragon.ecsign(hash, privateKey);
                         const combined = Buffer.concat([
                             Buffer.from(signed.r),
                             Buffer.from(signed.s),
-                            Buffer.from([signed.v])
+                            Buffer.from([signed.v]),
                         ]);
                         const signature = combined.toString('hex');
                         const signedMsg = JSON.stringify({
                             address: address.toLowerCase(),
-                            message:  message + ' ' + date,
-                            signature: '0x' + signature
+                            message: message + ' ' + date,
+                            signature: '0x' + signature,
                         });
                         resolve(signedMsg);
                     } else {
-                        reject(Error('Missing Arguments'))
+                        reject(Error('Missing Arguments'));
                     }
                 });
             }
 
             /**
             * verify a signed message
-            * @returns {string} address - The address that signed the message
+            * @return {string} address - The address that signed the message
             * @param {string} signature - The final signature starting with 0x
-            * @param {string} message - The message before it was signed
+            * @param {string} suppliedMessage - The message before it was signed
             */
             verifyMessage(signature, suppliedMessage) {
                 return new Promise((resolve, reject) => {
-                    if(signature && suppliedMessage){
+                    if (signature && suppliedMessage) {
                         const {v, r, s} = dragon.fromRpcSig(signature);
                         const message = dragon.toBuffer(dragon.sha3(suppliedMessage));
-                        const publicKey  = dragon.ecrecover(message, v, r, s);
+                        const publicKey = dragon.ecrecover(message, v, r, s);
                         const addressBuffer = dragon.publicToAddress(publicKey);
                         const address = dragon.bufferToHex(addressBuffer);
                         resolve(address.toLowerCase());
                     } else {
-                        reject(Error('Missing Arguments'))
+                        reject(Error('Missing Arguments'));
                     }
                 });
             }
-
-
         } window.customElements.define(FunctionMessage.is, FunctionMessage);
     </script>
 </dom-module>

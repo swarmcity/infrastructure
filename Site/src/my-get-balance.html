@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/get-balance.html">
+
+<dom-module id="my-get-balance">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <get-balance></get-balance>
+    </div>
+  </template>
+
+  <script>
+    class MyGetBalance extends Polymer.Element {
+        static get is() {return 'my-get-balance';
+    }
+    } window.customElements.define(MyGetBalance.is, MyGetBalance);
+  </script>
+</dom-module>

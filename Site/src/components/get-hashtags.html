@@ -1,0 +1,58 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../redux-state.html">
+
+<dom-module id="get-hashtags">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+
+        <div class="container">
+            <h1>Hashtags</h1>
+            <p><b>Select a hashtag from below</b></p>
+            <hr>
+        </div>
+        <template is="dom-repeat" items="{{hashtags}}">
+            <div>Hashtag Name: {{item.hashtagName}}</div>
+            <div>Hashtag Balance: {{item.hashtagBalance}}</div>
+            <div>Contract Address: {{item.contractAddress}}</div>
+            <div>Hashtag Items: {{item.hashtagItems}}</div>
+            <hr>
+        </template>
+
+    </template>
+    <script>
+
+        class GetHashtags extends new ReduxMixin(Polymer.Element) {
+            static get is() {
+                return 'get-hashtags';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * hashtags represents the list of hashtags
+                    * @type {Object}
+                    */
+                    hashtags: {
+                        type: Array,
+                        statePath: 'hashtags',
+                    },
+                };
+            }
+        } window.customElements.define(GetHashtags.is, GetHashtags);
+    </script>
+</dom-module>
+
