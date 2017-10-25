@@ -25,7 +25,5 @@ describe('Swarm City scheduler', function() {
 			},
 			data: 'a',
 		});
-		logger.info('there are ', workerQueue.scheduledTask.tasks.length,
-			'tasks in the scheduledTask queue');
 	});
 });

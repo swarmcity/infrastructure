@@ -7,12 +7,9 @@ const logger = require('../logs')();
 
 const workerQueue = require('../scheduler/workerQueue')();
 
-let intervalTask;
-
 describe('Swarm City scheduler', function() {
-
 	it('should receive all related events right after socket connects', function(done) {
-		intervalTask = workerQueue.scheduledTask.addTask({
+		workerQueue.scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 1000,
 			func: hello,
 			interval: 1000,
@@ -65,9 +62,6 @@ function hello(task) {
 function responseHandler(res, task) {
 	return new Promise((resolve, reject) => {
 		logger.info('Hello Finished... RES=', res, 'task=', task);
-		//if (intervalTask) {
-			workerQueue.scheduledTask.removeTask(intervalTask);
-		//}
 		resolve();
 	});
 }

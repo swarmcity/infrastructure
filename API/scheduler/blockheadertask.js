@@ -13,11 +13,14 @@ module.exports = function(workerqueue) {
 
 	let newBlockHeadersSubscription;
 
-	function manageSubscription() {
+	/**
+	 * manage the Web3 subscription. Turn on / off depending on state of task list
+	 */
+	function _manageSubscription() {
 		if (tasks.length === 0 && newBlockHeadersSubscription) {
 			newBlockHeadersSubscription.unsubscribe((error, success) => {
 				if (success) {
-					logger.info('unsubscribed from newBlockHeaders');
+					logger.info('unsubscribed from newBlockHeaders via Web3');
 				}
 			});
 		}
@@ -30,8 +33,10 @@ module.exports = function(workerqueue) {
 					while (task = tasks.shift()) {
 						workerqueue.push(task, task.responsehandler);
 					}
+					_manageSubscription();
 				}
 			});
+			logger.info('subscribed to newBlockHeaders via Web3');
 		}
 	}
 
@@ -46,13 +51,14 @@ module.exports = function(workerqueue) {
 		 * @return {object} - task that is waiting for the next block.
 		 */
 		addTask: function(options) {
+			logger.info('Add task');
 			let task = {
 				func: options.func,
 				responsehandler: options.responsehandler,
 				data: options.data,
 			};
 			tasks.push(task);
-			this.manageSubscription();
+			_manageSubscription();
 			return (task);
 		},
 
@@ -65,7 +71,7 @@ module.exports = function(workerqueue) {
 			let index = tasks.indexOf(task);
 			if (index !== -1) {
 				tasks.splice(index, 1);
-				this.manageSubscription();
+				_manageSubscription();
 			}
 		},
 
