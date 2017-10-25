@@ -18,7 +18,7 @@ module.exports = (config) => {
 			task.isRunning = false;
 			task.endDate = (new Date).getTime();
 			task.success = true;
-			logger.info('task success. Duration',task.endDate - task.startDate,'ms');
+			logger.info('task success. Duration', task.endDate - task.startDate, 'ms');
 			callback(res, task);
 		}).catch((err) => {
 			logger.error('task error', err);
