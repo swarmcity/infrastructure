@@ -11,17 +11,21 @@ module.exports = function(web3) {
 				request('https://api.coinmarketcap.com/v1/ticker/swarm-city/?convert=EUR',
 					(error, response, body) => {
 						if (error || (response && response.statusCode !== 200)) {
-							reject(error);
+							return reject(error);
 						}
-						let parsedBody = JSON.parse(body);
-						let result = {
-							price_btc: parsedBody[0].price_btc,
-							price_eur: parsedBody[0].price_eur,
-							price_usd: parsedBody[0].price_usd,
-							symbol: parsedBody[0].symbol,
-						};
-						logger.info('updateFx result=', result);
-						resolve(result);
+						try {
+							let parsedBody = JSON.parse(body);
+							let result = {
+								price_btc: parsedBody[0].price_btc,
+								price_eur: parsedBody[0].price_eur,
+								price_usd: parsedBody[0].price_usd,
+								symbol: parsedBody[0].symbol,
+							};
+							logger.info('updateFx result=', result);
+							return resolve(result);
+						} catch (e) {
+							return reject(e);
+						}
 					});
 			});
 		},

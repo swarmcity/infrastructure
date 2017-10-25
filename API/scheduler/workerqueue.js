@@ -12,16 +12,25 @@ module.exports = (config) => {
 
 	// create a queue object with default concurrency 2
 	let q = queue((task, callback) => {
+		task.isRunning = true;
+		task.startDate = (new Date).getTime();
 		task.func(task).then((res) => {
+			task.isRunning = false;
+			task.endDate = (new Date).getTime();
+			task.success = true;
+			logger.info('task success. Duration',task.endDate - task.startDate,'ms');
 			callback(res, task);
 		}).catch((err) => {
-			logger.error('workerqueue error', err);
+			logger.error('task error', err);
+			task.isRunning = false;
+			task.endDate = (new Date).getTime();
+			task.success = false;
 			callback(null, task);
 		});
 	}, config.concurrency || 2);
 
 	q.drain = () => {
-		logger.info('Task queue is drained');
+		logger.info('The task queue is drained');
 	};
 
 	return ({
