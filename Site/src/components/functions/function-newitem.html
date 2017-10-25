@@ -76,7 +76,7 @@
                               // we need to set it to zero first
                               // https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
 
-                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
+                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, window.kf[3].publicKey).then((gasNeeded) => {
                                 self.getGasPrice().then((result)=>{
                                   self.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, result, window.kf[3].publicKey, privateKey).then(()=>{
                                     self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
@@ -243,8 +243,6 @@
                 socket.emit('processTx', signedTx, function(_txhash){
                   resolve(_txhash);
                 });
-              } else {
-                  reject(Error('Missing Arguments'));
               });
             }
 
