@@ -5,7 +5,7 @@ const logger = require('../logs')();
 
 // worker queue is the worker queue for tasks that need to run NOW
 
-module.exports = function(config) {
+module.exports = (config) => {
 	if (!config) {
 		config = {};
 	}
@@ -20,15 +20,12 @@ module.exports = function(config) {
 		});
 	}, config.concurrency || 2);
 
-	const scheduledTask = require('./scheduledtask')(q);
-	const blockheaderTask = require('./blockheadertask')(q);
-
 	q.drain = () => {
-		logger.debug('all items have been processed');
+		logger.info('Task queue is drained');
 	};
 
 	return ({
-		scheduledTask: scheduledTask,
-		blockheaderTask: blockheaderTask,
+		scheduledTask: require('./scheduledtask')(q),
+		blockheaderTask: require('./blockheadertask')(q),
 	});
 };

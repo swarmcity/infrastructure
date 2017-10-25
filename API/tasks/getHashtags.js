@@ -1,7 +1,7 @@
 const logs = require('../logs.js')();
 module.exports = function(web3) {
 	return ({
-		_getHashtags: function(address) {
+		getHashtags: function(address) {
 			const hashtags = [{
 				contractAddress: '0x000',
 				hashtagName: 'FaffyDeeRides',

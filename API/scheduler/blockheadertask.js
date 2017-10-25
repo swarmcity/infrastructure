@@ -4,18 +4,36 @@
 
 const logger = require('../logs')();
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
 
 module.exports = function(workerqueue) {
 	let tasks = [];
+	let blockNumber = 0;
 
-	web3.eth.subscribe('newBlockHeaders', (error, result) => {
-		logger.info('newBlockHeaders event occured');
-		let task;
-		while (task = tasks.shift()) {
-			workerqueue.push(task, task.responsehandler);
+	let web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
+
+	let newBlockHeadersSubscription;
+
+	function manageSubscription() {
+		if (tasks.length === 0 && newBlockHeadersSubscription) {
+			newBlockHeadersSubscription.unsubscribe((error, success) => {
+				if (success) {
+					logger.info('unsubscribed from newBlockHeaders');
+				}
+			});
 		}
-	});
+		if (tasks.length > 0 && !newBlockHeadersSubscription) {
+			newBlockHeadersSubscription = web3.eth.subscribe('newBlockHeaders', (error, result) => {
+				if (result && result.number > blockNumber) {
+					blockNumber = result.number;
+					logger.info('newBlockHeaders event occured. Block height=', blockNumber);
+					let task;
+					while (task = tasks.shift()) {
+						workerqueue.push(task, task.responsehandler);
+					}
+				}
+			});
+		}
+	}
 
 	return ({
 		/**
@@ -33,8 +51,8 @@ module.exports = function(workerqueue) {
 				responsehandler: options.responsehandler,
 				data: options.data,
 			};
-
 			tasks.push(task);
+			this.manageSubscription();
 			return (task);
 		},
 
@@ -47,6 +65,7 @@ module.exports = function(workerqueue) {
 			let index = tasks.indexOf(task);
 			if (index !== -1) {
 				tasks.splice(index, 1);
+				this.manageSubscription();
 			}
 		},
 

@@ -1,79 +1,73 @@
 'use strict';
+require('dotenv').config({
+	path: '../.env',
+});
 
-require('dotenv').config({path: '../../.env'});
+const logger = require('../logs')();
+
 const workerQueue = require('../scheduler/workerQueue')();
+
+let intervalTask;
 
 describe('Swarm City scheduler', function() {
 
 	it('should receive all related events right after socket connects', function(done) {
-		let myTask = workerQueue.scheduledTask.addTask({
+		intervalTask = workerQueue.scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 1000,
 			func: hello,
-			interval : 1000,
-			data: 'a'
+			interval: 1000,
+			data: 'a',
 		});
 
+		logger.info('there are ', workerQueue.scheduledTask.tasks.length,
+			'tasks in the scheduledTask queue');
+		logger.info('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
 
-		console.log('there are ', workerQueue.scheduledTask.tasks.length, 'tasks in the scheduledTask queue');
-		console.log('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
-
-
-		//workerQueue.scheduledTask.removeTask(myTask);
-
-
-		console.log('there are ', workerQueue.scheduledTask.tasks.length, 'tasks in the scheduledTask queue');
-		console.log('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
+		logger.info('there are ', workerQueue.scheduledTask.tasks.length,
+			'tasks in the scheduledTask queue');
+		logger.info('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
 
 		workerQueue.scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 2000,
 			func: hello,
 			responsehandler: responseHandler,
-			data: 'b'
+			data: 'b',
 		});
 
 		workerQueue.scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 3000,
 			func: hello,
 			responsehandler: responseHandler,
-			data: 'c'
+			data: 'c',
 		});
-
-
 	});
-
 });
 
+/**
+ * Test task
+ * @param {object} task - the task to run
+ * @return {Promise} - resolves when done
+ */
 function hello(task) {
 	return new Promise((resolve, reject) => {
-		console.log('Hello', task.data);
+		logger.info('Hello', task.data);
 		task.data = task.data + '+';
-
 		resolve(task.data);
 	});
 }
 
+/**
+ * Test task
+ * @param {object} res - the result from the task
+ * @param {object} task - the task that ran
+ * @return {Promise} - resolves when done
+ */
 function responseHandler(res, task) {
 	return new Promise((resolve, reject) => {
-		console.log('Hello Finished... RES=', res, 'task=', task);
-		// workerQueue.scheduledTask.addTask({
-		// 	nextRun: task.nextRun + 1000,
-		// 	func: task.func,
-		// 	responsehandler: responseHandler,
-		// 	data: task.data
-		// });
+		logger.info('Hello Finished... RES=', res, 'task=', task);
+		//if (intervalTask) {
+			workerQueue.scheduledTask.removeTask(intervalTask);
+		//}
 		resolve();
-	});
-}
-
-function responseHandler2(res, task) {
-	return new Promise((resolve, reject) => {
-		console.log('Hello 2 Finished... RES=', res, 'task=', task);
-		// scheduler.addTask(scheduler.makeScheduledTask({
-		// 	nextRun: (new Date).getTime() + 1000,
-		// 	func: hello,
-		// 	responsehandler: responseHandler2,
-		// 	data: '-' //task.data
-		// }));
-		//resolve(task.data);
 	});
 }

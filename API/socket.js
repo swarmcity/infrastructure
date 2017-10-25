@@ -12,21 +12,24 @@ const logs = require('./logs.js')();
 const workerQueue = require('./scheduler/workerqueue')();
 
 // scheduled task handlers
-const getFx = require('./tasks/getFx.js')(web3);
+const getFx = require('./tasks/getFx')(web3);
+const getGasPrice = require('./tasks/getGasPrice')(web3);
+const getHashtags = require('./tasks/getHashtags')(web3);
 
 // socket task handlers
-const getBalance = require('./tasks/getBalance.js')(web3);
+const getBalance = require('./tasks/getBalance')(web3);
 
 let connectedSockets = {};
 
-(function() {
+(() => {
+	// schedule getFx task every minute
 	workerQueue.scheduledTask.addTask({
 		func: getFx.updateFx,
 		interval: 60 * 1000,
 	});
 })();
 
-io.on('connection', function(socket) {
+io.on('connection', (socket) => {
 	if (!socket.handshake.query.publicKey) {
 		logs._errorLog('no pubkey given.');
 		return socket.disconnect(true);
@@ -34,48 +37,77 @@ io.on('connection', function(socket) {
 
 	logs.info('socket', socket.id, 'connected');
 
-	socket.emit('QUAAK', null);
-
 	let client = {
 		publicKey: socket.handshake.query.publicKey,
 		socket: socket,
-		scheduledtasks: [],
+		scheduledTasks: [],
 	};
 
 	connectedSockets[socket.id] = client;
 
-	let task = workerQueue.scheduledTask.addTask({
-		func: (task) => {
-			return getBalance.getBalance(task.data);
-		},
-		responsehandler: (res, task) => {
-			logs.info('received RES=', JSON.stringify(res, null, 4));
-			task.data.socket.emit('balanceChanged', res);
-		},
-		data: {
-			socket: socket,
-			address: socket.handshake.query.publicKey,
-		},
-	});
+	client.scheduledTasks.push(
+		workerQueue.scheduledTask.addTask({
+			func: (task) => {
+				return getBalance.getBalance(task.data);
+			},
+			responsehandler: (res, task) => {
+				logs.info('received getBalance RES=', JSON.stringify(res, null, 4));
+				task.data.socket.emit('balanceChanged', res);
+			},
+			data: {
+				socket: socket,
+				address: socket.handshake.query.publicKey,
+			},
+		})
+	);
 
-	client.scheduledtasks.push(task);
+	client.scheduledTasks.push(
+		workerQueue.scheduledTask.addTask({
+			func: (task) => {
+				return getFx.updateFx();
+			},
+			responsehandler: (res, task) => {
+				logs.info('received getFx RES=', JSON.stringify(res, null, 4));
+				task.data.socket.emit('fxChanged', res);
+			},
+			data: {
+				socket: socket,
+				address: socket.handshake.query.publicKey,
+			},
+		})
+	);
 
+	client.scheduledTasks.push(
+		workerQueue.scheduledTask.addTask({
+			func: (task) => {
+				return getGasPrice.getGasPrice();
+			},
+			responsehandler: (res, task) => {
+				logs.info('received getGasPrice RES=', JSON.stringify(res, null, 4));
+				task.data.socket.emit('gasPriceChanged', res);
+			},
+			data: {
+				socket: socket,
+				address: socket.handshake.query.publicKey,
+			},
+		})
+	);
 
-	let task2 = workerQueue.scheduledTask.addTask({
-		func: (task) => {
-			return getFx.updateFx();
-		},
-		responsehandler: (res, task) => {
-			logs.info('received getFx RES=', JSON.stringify(res, null, 4));
-			task.data.socket.emit('fxChanged', res);
-		},
-		data: {
-			socket: socket,
-			address: socket.handshake.query.publicKey,
-		},
-	});
-
-	client.scheduledtasks.push(task2);
+	client.scheduledTasks.push(
+		workerQueue.scheduledTask.addTask({
+			func: (task) => {
+				return getHashtags.getHashtags();
+			},
+			responsehandler: (res, task) => {
+				logs.info('received getHashtags RES=', JSON.stringify(res, null, 4));
+				task.data.socket.emit('hashtagsChanged', res);
+			},
+			data: {
+				socket: socket,
+				address: socket.handshake.query.publicKey,
+			},
+		})
+	);
 
 	// const getBalance = {
 	// 	nextRun: 0,
@@ -118,7 +150,7 @@ io.on('connection', function(socket) {
 
 	socket.on('disconnect', () => {
 		logs.info('socket', socket.id, 'disconnected');
-		workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledtasks);
+		workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledTasks);
 		delete connectedSockets[socket.id];
 	});
 
