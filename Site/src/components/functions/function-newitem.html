@@ -176,7 +176,7 @@
 
                 var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
                 // emit it to the api > processTx
-                resolve(serializedtx);
+
             });
           }
 
@@ -197,12 +197,12 @@
                 var gasPrice = parseInt(_gasPrice);
 
                 const rawTx = {
-                  from: "0x5263261bAD400DEf63AF145270B2bD144ec64E14",
-                  nonce: 452,
-                  to: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
+                  nonce: window.kf[3].nonce++,
+                  to: "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607",
                   data: encodedtx,
                   gasPrice: gasPrice,
-                  gasLimit: 6722217
+                  gasLimit: _gasNeeded,
+                  value: 0
                 };
 
                 var approvetx = new dragon.Transaction(rawTx);
@@ -210,7 +210,8 @@
                 approvetx.sign(_privatekey);
                 var signedApproveTx = dragon.addHexPrefix(approvetx.serialize().toString('hex'));
                 console.log('---> first inject the approve tx ', signedApproveTx);
-                debugger;
+                // wait for the txhash to come back from the API and then go on
+
                 resolve(signedApproveTx);
               });
             }
@@ -236,6 +237,18 @@
                     }
                 });
             }
+
+            processTx(signedTx) {
+              return new Promise((resolve, reject) => {
+                socket.emit('processTx', signedTx, function(_txhash){
+                  resolve(_txhash);
+                });
+              } else {
+                  reject(Error('Missing Arguments'));
+              });
+            }
+
+
 
 
         } window.customElements.define(FunctionNewItem.is, FunctionNewItem);

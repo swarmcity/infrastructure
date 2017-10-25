@@ -5,13 +5,13 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
-const web3http = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io'));
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
 const getHashtagItems = require('./tasks/getHashtagItems.js')(web3);
 const estimateGas = require('./tasks/estimateGas.js')(web3);
 const getGasPrice = require('./tasks/getGasPrice.js')(web3);
+const processTx = require('./tasks/processTx.js')(web3);
 const checkApprovalStatus = require('./tasks/checkApprovalStatus.js')(web3);
 const taskFunctions = require('./tasks/index.js');
 
@@ -162,6 +162,17 @@ io.on('connection', function(socket) {
 			});
 		}).catch((err) => {
 			logs._errorLog('getGasPrice ERR! ', err);
+		});
+	});
+	socket.on('processTx', (signedtx, response) => {
+    processTx._processTx(signedtx).then((txhash) => {
+			//socket.emit('estimateGasChanged', res);
+			response({
+				status: 200,
+				result: txhash
+			});
+		}).catch((err) => {
+			logs._errorLog('processTx ERR! ', err);
 		});
 	});
 	socket.on('getNoonce', (data, response) => {
