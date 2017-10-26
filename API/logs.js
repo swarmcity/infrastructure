@@ -1,14 +1,24 @@
 const winston = require('winston');
+const logger = new winston.Logger({
+  transports: [
+    new winston.transports.Console({
+      handleExceptions: true,
+      json: false
+    })
+  ],
+  exitOnError: false
+});
+
 
 module.exports = function() {
-	return Object.assign(winston, {
+	return Object.assign(logger, {
 		/**
 		 * Significant events get logged as an audit trail
 		 * @param {Object} item 
 		 * @param {Strring} type 
 		 */
 		_eventLog: function(item, type) {
-			winston.info(item);
+			logger.info(item);
 		},
 		/**
 		 * Errors get logged 
@@ -16,7 +26,7 @@ module.exports = function() {
 		 * @param {Strring} type 
 		 */
 		_errorLog: function(item, type) {
-			winston.error(item);
+			logger.error(item);
 		},
 	});
 };
