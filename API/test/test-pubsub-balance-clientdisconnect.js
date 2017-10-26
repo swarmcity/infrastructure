@@ -31,7 +31,7 @@ describe('Swarm City API socket client > test client disconnect', function() {
 					channel: 'balance',
 					args: {
 						address: '0x7018d8f698bfa076e1bdc916e2c64caddc750944',
-					}
+					},
 				}, (data) => {
 					should(data).have.property('response', 200);
 					should(data).have.property('subscriptionId');
@@ -56,5 +56,4 @@ describe('Swarm City API socket client > test client disconnect', function() {
 		client.close();
 		done();
 	});
-
 });

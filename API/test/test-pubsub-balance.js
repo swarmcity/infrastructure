@@ -30,7 +30,7 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 					channel: 'balance',
 					args: {
 						address: '0x7018d8f698bfa076e1bdc916e2c64caddc750944',
-					}
+					},
 				}, (data) => {
 					should(data).have.property('response', 200);
 					should(data).have.property('subscriptionId');
@@ -55,7 +55,7 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 	it('should unsubscribe / receive a confirmation', function(done) {
 		let promises = [];
 		subscriptions.forEach((subscription) => {
-			logger.info('unsubscribe from',subscription);
+			logger.info('unsubscribe from', subscription);
 			promises.push(new Promise((resolve, reject) => {
 				client.emit('unsubscribe', {
 					subscriptionId: subscription,

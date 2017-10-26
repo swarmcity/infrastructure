@@ -19,7 +19,7 @@ const getHashtags = require('./tasks/getHashtags')(web3);
 // socket task handlers
 const getBalance = require('./tasks/getBalance')(web3);
 
-//subscription handler
+// subscription handler
 const subscriptions = require('./subscriptions')();
 
 let connectedSockets = {};
@@ -114,21 +114,18 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		logs.info('socket', socket.id, 'disconnected');
-		//workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledTasks);
-		//delete connectedSockets[socket.id];
 		subscriptions.unsubscribeAll(socket.id);
 	});
 
 	// handle subscribe
-	socket.on('subscribe', (data,callback) => {
-		subscriptions.subscribe(socket,data,callback);
+	socket.on('subscribe', (data, callback) => {
+		subscriptions.subscribe(socket, data, callback);
 	});
 
 	// handle unsubscribe
-	socket.on('unsubscribe', (data,callback) => {
-		subscriptions.unsubscribe(socket,data,callback);
+	socket.on('unsubscribe', (data, callback) => {
+		subscriptions.unsubscribe(socket, data, callback);
 	});
-
 });
 
 const PORT = process.env.APISOCKETPORT;
