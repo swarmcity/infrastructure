@@ -2,7 +2,7 @@ node_modules
 .DS_Store
 platform.env
 data/
-DragonSite/bower_components/
-DragonSite/build/
+Site/bower_components/
+Site/build/
 npm-debug.log
 Store/package-lock.json

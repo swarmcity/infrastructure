@@ -1,22 +1,19 @@
 {
-  "name": "dragon-system",
+  "name": "swarmcity-system",
   "version": "0.0.1-rc.4",
-  "description": "Dragon system installer",
+  "description": "Swarmcity system installer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": {
-    "dragon": "./dragon.js"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DragonSystems/DragonSystem.git"
+    "url": "https://github.com/swarmcity/infrastructure"
   },
   "keywords": [
     "Ethereum"
   ],
-  "author": "Dragon System",
+  "author": "Swramcity System",
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.1.0",
@@ -33,9 +30,9 @@
     "winston": "^2.3.1"
   },
   "bugs": {
-    "url": "https://github.com/DragonSystems/DragonSystem/issues"
+    "url": "https://github.com/swarmcity/infrastructure/issues"
   },
-  "homepage": "https://github.com/DragonSystems/DragonSystem#readme",
+  "homepage": "https://swarm.city",
   "devDependencies": {
     "eslint-config-google": "^0.9.1"
   }

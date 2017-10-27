@@ -1,7 +1,7 @@
 
-The Dragon System is a production class development framework and API for Ethereum web apps.
+The Swarmcity Infrastructure is a production class development framework and API for Ethereum web apps.
 
-At the moment dragon-system will only work on Mac OSX and Linux. 
+At the moment swarmcity-system will only work on Mac OSX and Linux. 
 
 ### Install dependencies
 
@@ -40,3 +40,4 @@ You can follow below steps to clean your environment.
 
 - `docker rmi $(docker images | awk '/dragon/{print $3}')`
 
+Swarmcity-infrastructure was forked from [DragonSystem](https://github.com/DragonSystems/DragonSystem)
