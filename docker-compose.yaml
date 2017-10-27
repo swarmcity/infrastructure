@@ -43,6 +43,22 @@ services:
     volumes:
       - /tmp/parity/:/root/.local/share/io.parity.ethereum/
 
+  geth:
+    build:
+      context: Chain-geth
+    image: "${GETH_IMAGE}"
+    command:
+      --fast --cache=512 --ws --wsaddr 0.0.0.0 --wsport 8546 --wsorigins '*' --wsapi 'eth,net,web3,shh' --shh
+    ports:
+      - "8080:8080"
+      - "8180:8180"
+      - "8545:8545"
+      - "8546:8546"
+    env_file:
+      - platform.env
+    volumes:
+      - /tmp/geth/:/root
+
   api:
     build:
       context: API

@@ -1,2 +1,2 @@
-FROM parity/parity:v1.7.2
+FROM parity/parity:stable
 ENTRYPOINT ["/parity/parity"]
