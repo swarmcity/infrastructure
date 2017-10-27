@@ -5,11 +5,11 @@ require('dotenv').config({
 
 const logger = require('../logs')();
 
-const workerQueue = require('../scheduler/workerqueue')();
+const blockheaderTask = require('../scheduler/blockheadertask')();
 
 describe('Swarm City scheduler', function() {
 	it('should add & unroll blockheaderTask task', function(done) {
-		workerQueue.blockheaderTask.addTask({
+		blockheaderTask.addTask({
 			func: (task) => {
 				return new Promise((resolve, reject) => {
 					logger.info('Hello', task.data);
@@ -21,6 +21,7 @@ describe('Swarm City scheduler', function() {
 				return new Promise((resolve, reject) => {
 					logger.info('Hello Finished... RES=', res, 'task=', task);
 					resolve();
+					done();
 				});
 			},
 			data: 'a',

@@ -26,7 +26,7 @@ let q = queue((task, callback) => {
 }, 2);
 
 q.drain = () => {
-	logger.info('The task queue is drained');
+	logger.info('The WorkerQueue is empty');
 };
 
 module.exports = () => {
