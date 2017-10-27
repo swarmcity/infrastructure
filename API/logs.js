@@ -1,12 +1,14 @@
 const winston = require('winston');
 const logger = new winston.Logger({
-  transports: [
-    new winston.transports.Console({
-      handleExceptions: true,
-      json: false,
-    }),
-  ],
-  exitOnError: false,
+	transports: [
+		new winston.transports.Console({
+			handleExceptions: true,
+			json: false,
+			colorize: true,
+			timestamp: true,
+		}),
+	],
+	exitOnError: false,
 });
 
 

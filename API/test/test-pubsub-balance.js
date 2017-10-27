@@ -51,8 +51,19 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 		});
 	});
 
+	it('should wait a while for a block', (done) => {
+		// listen to updates....
+		client.on('balanceChanged', (data) => {
+			logger.info('balanceChanged');
+			logger.info('received balance update...', data);
+		});
 
-	it('should unsubscribe / receive a confirmation', function(done) {
+		setTimeout(() => {
+			done();
+		}, 50 * 1000);
+	});
+
+	it('should unsubscribe / receive a confirmation', (done) => {
 		let promises = [];
 		subscriptions.forEach((subscription) => {
 			logger.info('unsubscribe from', subscription);
@@ -76,7 +87,7 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 	});
 
 
-	after(function(done) {
+	after((done) => {
 		client.close();
 		done();
 	});

@@ -50,11 +50,13 @@ describe('Swarm City API socket client', function() {
 		Promise.all(promises).then(() => {
 			done();
 		}).catch((err) => {
-			logger.info(err);
+			logger.error(err);
+			done();
 		});
 	});
 
 	after(function(done) {
+		logger.info('closing client socket');
 		client.close();
 		done();
 	});

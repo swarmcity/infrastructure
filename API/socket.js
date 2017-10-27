@@ -1,23 +1,18 @@
-'use strict';
-require('dotenv').config({
-	path: '../.env',
-});
+require('./environment');
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
 const logs = require('./logs.js')();
 
-const workerQueue = require('./scheduler/workerqueue')();
+const scheduledTask = require('./scheduler/scheduledtask')();
 
 // scheduled task handlers
-const getFx = require('./tasks/getFx')(web3);
-const getGasPrice = require('./tasks/getGasPrice')(web3);
-const getHashtags = require('./tasks/getHashtags')(web3);
+const getFx = require('./tasks/getFx')();
+const getGasPrice = require('./tasks/getGasPrice')();
+const getHashtags = require('./tasks/getHashtags')();
 
 // socket task handlers
-const getBalance = require('./tasks/getBalance')(web3);
+const getBalance = require('./tasks/getBalance')();
 
 // subscription handler
 const subscriptions = require('./subscriptions')();
@@ -26,7 +21,7 @@ let connectedSockets = {};
 
 (() => {
 	// schedule getFx task every minute
-	workerQueue.scheduledTask.addTask({
+	scheduledTask.addTask({
 		func: getFx.updateFx,
 		interval: 60 * 1000,
 	});
@@ -49,7 +44,7 @@ io.on('connection', (socket) => {
 	connectedSockets[socket.id] = client;
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getBalance.getBalance(task.data);
 			},
@@ -65,7 +60,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getFx.getFx();
 			},
@@ -81,7 +76,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getGasPrice.getGasPrice();
 			},
@@ -97,7 +92,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getHashtags.getHashtags();
 			},
