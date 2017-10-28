@@ -14,11 +14,11 @@ RUN ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \
 WORKDIR /
 COPY package.json package.json
 COPY server.js server.js
-COPY startup startup
+COPY run.sh /run.sh
 RUN npm install
 
 EXPOSE 5001
 EXPOSE 4001
 EXPOSE 9000
 
-ENTRYPOINT /startup
+ENTRYPOINT /run.sh
