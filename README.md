@@ -31,6 +31,14 @@ At the moment swarmcity-system will only work on Mac OSX and Linux.
 
 in Site directory, create build folders following the README
 
+### Host type
+
+Dev machine, local
+
+Production
+  - dependencies: aws-cli
+
+
 ### Ports 
 
 API
