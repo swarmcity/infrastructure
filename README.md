@@ -31,6 +31,34 @@ At the moment swarmcity-system will only work on Mac OSX and Linux.
 
 in Site directory, create build folders following the README
 
+### Ports 
+
+API
+- 8011
+
+Chain-parity
+- 8081
+- 8180
+- 8545
+- 8546
+
+Chain-geth
+- 30303
+- 8545
+- 8546
+
+Proxy
+- 80
+-443
+
+Store
+- 8080
+
+Store
+- 5001
+- 4001
+- 9000
+
 
 ### Clean the environment
 
