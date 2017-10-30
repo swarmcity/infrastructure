@@ -1,0 +1,84 @@
+{
+  "requiresAttributes": [
+    {
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.ecr-auth",
+      "targetId": null,
+      "targetType": null
+    },
+    {
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21",
+      "targetId": null,
+      "targetType": null
+    }
+  ],
+  "taskDefinitionArn": "arn:aws:ecs:us-west-1:599399774093:task-definition/swarmcity_ipfs:2",
+  "networkMode": "bridge",
+  "status": "ACTIVE",
+  "revision": 2,
+  "taskRoleArn": null,
+  "containerDefinitions": [
+    {
+      "volumesFrom": [],
+      "memory": null,
+      "extraHosts": null,
+      "linuxParameters": null,
+      "dnsServers": null,
+      "disableNetworking": null,
+      "dnsSearchDomains": null,
+      "portMappings": [
+        {
+          "hostPort": 5001,
+          "containerPort": 5001,
+          "protocol": "tcp"
+        },
+        {
+          "hostPort": 4001,
+          "containerPort": 4001,
+          "protocol": "tcp"
+        },
+        {
+          "hostPort": 9000,
+          "containerPort": 9000,
+          "protocol": "tcp"
+        }
+      ],
+      "hostname": null,
+      "essential": true,
+      "entryPoint": null,
+      "mountPoints": [
+        {
+          "containerPath": "/ipfsrepo",
+          "sourceVolume": "ipfsrepo",
+          "readOnly": null
+        }
+      ],
+      "name": "swarmcity_ipfs",
+      "ulimits": null,
+      "dockerSecurityOptions": null,
+      "environment": [],
+      "links": null,
+      "workingDirectory": null,
+      "readonlyRootFilesystem": null,
+      "image": "599399774093.dkr.ecr.us-west-1.amazonaws.com/swarmcity_ipfs:latest",
+      "command": null,
+      "user": null,
+      "dockerLabels": null,
+      "logConfiguration": null,
+      "cpu": 0,
+      "privileged": null,
+      "memoryReservation": 256
+    }
+  ],
+  "placementConstraints": [],
+  "volumes": [
+    {
+      "host": {
+        "sourcePath": "/ipfsrepo"
+      },
+      "name": "ipfsrepo"
+    }
+  ],
+  "family": "swarmcity_ipfs"
+}
