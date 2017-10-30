@@ -12,9 +12,10 @@ RUN ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true
 RUN ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
 
 WORKDIR /
+COPY server.sh /server.sh
+
 COPY package.json package.json
 COPY server.js server.js
-COPY run.sh /run.sh
 RUN npm install
 
 EXPOSE 5001
