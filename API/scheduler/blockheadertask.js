@@ -51,7 +51,7 @@ function removeTask(task) {
 	} else {
 		logger.error('removeTask: cannot find task in task list', task.id);
 	}
-	if (tasks.length ===0){
+	if (tasks.length === 0) {
 		logger.info('the blockheadertask scheduler is empty');
 	}
 }

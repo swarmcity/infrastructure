@@ -52,7 +52,6 @@ describe('Swarm City scheduler', function() {
 		scheduledTask.removeTasks(scheduledTask.tasks);
 		done();
 	});
-
 });
 
 /**
