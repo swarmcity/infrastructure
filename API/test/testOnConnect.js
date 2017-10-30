@@ -1,23 +1,31 @@
 'use strict';
-require('dotenv').config({
-	path: '../../.env',
-});
 
 const logger = require('../logs')();
-
 const io = require('socket.io-client');
-// const socketWildcard = require('socketio-wildcard')();
-// var patch = require('socketio-wildcard')(io.Manager);
 
-const socketURL = 'http://localhost:8011?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
 const options = {
 	'transports': ['websocket'],
 	'force new connection': true,
 };
 
+// create a server 
+const server = require('../socket');
+
+
 
 describe('Swarm City API socket client', function() {
 	let client;
+	let socketURL;
+
+
+	before(function(done) {
+		server.listen().then((con) => {
+			socketURL = 'http://localhost:' + con.port + '?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
+			logger.info('socketURL=', socketURL);
+			done();
+		})
+	});
+
 	it('should receive all related events right after socket connects', function(done) {
 		logger.info('connecting to ', socketURL);
 		client = io.connect(socketURL, options);
@@ -57,7 +65,12 @@ describe('Swarm City API socket client', function() {
 
 	after(function(done) {
 		logger.info('closing client socket');
-		client.close();
-		done();
+		client.close(() => {
+			logger.info('client closed...');
+		});
+		server.close().then(() => {
+			logger.info('server closed...');
+			done();
+		});
 	});
 });

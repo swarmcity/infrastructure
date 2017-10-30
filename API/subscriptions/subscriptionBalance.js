@@ -5,7 +5,7 @@
 const logs = require('../logs.js')();
 
 const getBalance = require('../tasks/getBalance')();
-const blockheaderTask = require('../scheduler/blockheadertask')();
+const blockHeaderTask = require('../scheduler/blockHeaderTask')();
 
 /**
  * clean up a task from the scheduler when socket wants to unsubscribe
@@ -15,7 +15,7 @@ const blockheaderTask = require('../scheduler/blockheadertask')();
  */
 function cancelSubscription(task) {
 	return Promise.resolve(
-		blockheaderTask.removeTask(task)
+		blockHeaderTask.removeTask(task)
 	);
 }
 
@@ -37,16 +37,17 @@ function createSubscription(socket, args) {
 			}));
 		},
 		responsehandler: (res, task) => {
+			JSON.stringify
 			logs.debug('received getBalance RES=', JSON.stringify(res, null, 4));
 			task.data.socket.emit('balanceChanged', res);
-			return blockheaderTask.addTask(task);
+			return blockHeaderTask.addTask(task);
 		},
 		data: {
 			socket: socket,
 			address: args.address,
 		},
 	};
-	blockheaderTask.addTask(_task);
+	blockHeaderTask.addTask(_task);
 	// run it a first time return subscription
 	return _task.func(_task).then((reply) => {
 		return Promise.resolve({

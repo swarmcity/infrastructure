@@ -8,7 +8,7 @@ const uuidv4 = require('uuid/v4');
 
 
 // load the channel subscription handlers
-const balance = require('./subscription-balance')();
+const balance = require('./subscriptionBalance')();
 
 // initialize available subscriptionchannels
 let channels = {};

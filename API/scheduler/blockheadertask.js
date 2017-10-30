@@ -3,10 +3,10 @@
 // Scheduled tasks are tasks that need to run when the next ETH block arrives.
 
 const logger = require('../logs')();
-const web3 = require('../globalweb3').web3;
+const web3 = require('../globalWeb3').web3;
 const uuidv4 = require('uuid/v4');
 
-const workerQueue = require('./workerqueue')();
+const workerQueue = require('./workerQueue')();
 
 let newBlockHeadersSubscription;
 let tasks = [];

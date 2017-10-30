@@ -1,15 +1,11 @@
 'use strict';
-require('dotenv').config({
-	path: '../.env',
-});
-
 const logger = require('../logs')();
 
-const blockheaderTask = require('../scheduler/blockheadertask')();
+const blockHeaderTask = require('../scheduler/blockHeaderTask')();
 
 describe('Swarm City scheduler', function() {
-	it('should add & unroll blockheaderTask task', function(done) {
-		blockheaderTask.addTask({
+	it('should add & unroll blockHeaderTask task', function(done) {
+		blockHeaderTask.addTask({
 			func: (task) => {
 				return new Promise((resolve, reject) => {
 					logger.info('Hello', task.data);

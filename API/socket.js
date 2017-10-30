@@ -123,9 +123,48 @@ io.on('connection', (socket) => {
 	});
 });
 
-const PORT = process.env.APISOCKETPORT;
-const HOST = '0.0.0.0';
+const APISOCKETPORT = process.env.APISOCKETPORT;
+const APIHOST = process.env.APIHOST || '0.0.0.0';
+/**
+ * start the socket server and start listening
+ *
+ * @return     {Promise}  { resolves with { port , host} when listening }
+ */
+function listen() {
+	return new Promise((resolve, reject) => {
+		if (!APISOCKETPORT || !APIHOST) {
+			return reject('no APISOCKETPORT defined in environment');
+		}
+		server.listen(APISOCKETPORT, APIHOST, (err) => {
+			if (err) {
+				return reject(err);
+			}
+			logs.info('server listening on host ', APIHOST, 'port', APISOCKETPORT);
+			return resolve({
+				port: APISOCKETPORT,
+				host: APIHOST,
+			});
+		});
+	});
+}
 
-logs.info('server listening on host ', HOST, 'port', PORT);
+/**
+ * stop listening for new connections
+ *
+ * @return     {Promise}  { description_of_the_return_value }
+ */
+function close() {
+	return new Promise((resolve, reject) => {
+		server.close((err) => {
+			if (err) {
+				return reject(err);
+			}
+			return resolve();
+		});
+	});
+}
 
-server.listen(PORT, HOST);
+module.exports = {
+	listen: listen,
+	close: close,
+}
