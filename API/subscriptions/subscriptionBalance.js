@@ -3,7 +3,7 @@
  */
 'use strict';
 const logs = require('../logs.js')();
-
+const jsonHash = require('json-hash');
 const getBalance = require('../tasks/getBalance')();
 const blockHeaderTask = require('../scheduler/blockHeaderTask')();
 
@@ -32,13 +32,19 @@ function createSubscription(socket, args) {
 	let _task = {
 		func: (task) => {
 			return Promise.resolve(getBalance.getBalance(task.data).then((res) => {
-				task.data.lastReply = res;
+				task.data.lastReplyHash = jsonHash.digest(res);
 				return (res);
 			}));
 		},
 		responsehandler: (res, task) => {
-			JSON.stringify
-			logs.debug('received getBalance RES=', JSON.stringify(res, null, 4));
+			let replyHash = jsonHash.digest(res);
+			if (task.data.lastReplyHash !== replyHash) {
+				logs.debug('received getBalance RES=', JSON.stringify(res, null, 4));
+				task.data.socket.emit('balanceChanged', res);
+				task.data.lastReplyHash = replyHash;
+			} else {
+				logs.info('getBalance => data hasn\'t changed.');
+			}
 			task.data.socket.emit('balanceChanged', res);
 			return blockHeaderTask.addTask(task);
 		},
