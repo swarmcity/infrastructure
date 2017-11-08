@@ -17,6 +17,10 @@ const getBalance = require('./tasks/getBalance')();
 // subscription handler
 const subscriptions = require('./subscriptions')();
 
+// functions handler
+const functions = require('./functions')();
+
+
 let connectedSockets = {};
 
 (() => {
@@ -28,22 +32,16 @@ let connectedSockets = {};
 })();
 
 io.on('connection', (socket) => {
-	if (!socket.handshake.query.publicKey) {
-		logs._errorLog('no pubkey given.');
-		return socket.disconnect(true);
-	}
-
 	logs.info('socket', socket.id, 'connected');
 
 	let client = {
-		publicKey: socket.handshake.query.publicKey,
 		socket: socket,
-		scheduledTasks: [],
 	};
 
 	connectedSockets[socket.id] = client;
 
-	client.scheduledTasks.push(
+	// if user provided a pubkey , register some initial tasks
+	if (socket.handshake.query.publicKey) {
 		scheduledTask.addTask({
 			func: (task) => {
 				return getBalance.getBalance(task.data);
@@ -56,10 +54,8 @@ io.on('connection', (socket) => {
 				socket: socket,
 				address: socket.handshake.query.publicKey,
 			},
-		})
-	);
+		});
 
-	client.scheduledTasks.push(
 		scheduledTask.addTask({
 			func: (task) => {
 				return getFx.getFx();
@@ -72,10 +68,8 @@ io.on('connection', (socket) => {
 				socket: socket,
 				address: socket.handshake.query.publicKey,
 			},
-		})
-	);
+		});
 
-	client.scheduledTasks.push(
 		scheduledTask.addTask({
 			func: (task) => {
 				return getGasPrice.getGasPrice();
@@ -88,10 +82,8 @@ io.on('connection', (socket) => {
 				socket: socket,
 				address: socket.handshake.query.publicKey,
 			},
-		})
-	);
+		});
 
-	client.scheduledTasks.push(
 		scheduledTask.addTask({
 			func: (task) => {
 				return getHashtags.getHashtags();
@@ -104,8 +96,8 @@ io.on('connection', (socket) => {
 				socket: socket,
 				address: socket.handshake.query.publicKey,
 			},
-		})
-	);
+		});
+	}
 
 	socket.on('disconnect', () => {
 		logs.info('socket', socket.id, 'disconnected');
@@ -121,6 +113,9 @@ io.on('connection', (socket) => {
 	socket.on('unsubscribe', (data, callback) => {
 		subscriptions.unsubscribe(socket, data, callback);
 	});
+
+	// register all verbs for functions
+	functions.registerHandlers(socket);
 });
 
 const APISOCKETPORT = process.env.APISOCKETPORT;

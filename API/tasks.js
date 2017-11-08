@@ -9,9 +9,10 @@ module.exports = function(web3) {
 	return {
 		/**
 		 * Update FX
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}    queue   The queue
+		 * @param      {Object}   task    The task
+		 * @return     {Promise}  task that should resolve
 		 */
 		_updateFx: function(queue, task) {
 			return getFx._updateFx().then((res) => {
@@ -25,9 +26,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Get FX
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The effects.
 		 */
 		_getFx: function(queue, task) {
 			return getFx._getFx().then((res) => {
@@ -40,9 +42,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Get Balance
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The balance.
 		 */
 		_getBalance: function(queue, task) {
 			return getBalance._getBalance(task.publicKey).then((res) => {
@@ -55,9 +58,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Get Gas Price
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The gas price.
 		 */
 		_getGasPrice: function(queue, task) {
 			return getGasPrice._getGasPrice(task.publicKey).then((res) => {
@@ -70,9 +74,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Get Hash Tag
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The hashtags.
 		 */
 		_getHashtags: function(queue, task) {
 			return getHashtags._getHashtags(task.publicKey).then((res) => {
@@ -85,9 +90,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Get Avatar
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The avatar.
 		 */
 		_getAvatar: function(queue, task) {
 			return Avatar._getAvatar(task.hash).then((res) => {
@@ -100,9 +106,10 @@ module.exports = function(web3) {
 		},
 		/**
 		 * Set Avatar
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   { description_of_the_return_value }
 		 */
 		_setAvatar: function(queue, task) {
 			return Avatar._setAvatar(task.base64).then((res) => {
@@ -113,11 +120,13 @@ module.exports = function(web3) {
 				logs._errorLog('set avatar ERR! ', err);
 			});
 		},
+
 		/**
 		 * Get Heath
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The health.
 		 */
 		_getHealth: function(queue, task) {
 			return new Promise((resolve, reject) => {
@@ -125,11 +134,13 @@ module.exports = function(web3) {
 				resolve('getHealth');
 			});
 		},
+
 		/**
 		 * Get Pending transactions
-		 * @param {Array} queue
-		 * @param {Object} task
-		 * @return {Array}
+		 *
+		 * @param      {Array}   queue   The queue
+		 * @param      {Object}  task    The task
+		 * @return     {Array}   The pending transactions.
 		 */
 		_getPendingTransactions: function(queue, task) {
 			return new Promise((resolve, reject) => {

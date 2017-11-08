@@ -17,13 +17,14 @@ module.exports = function() {
 							let parsedBody = JSON.parse(body);
 							let result = {
 								price_btc: parsedBody[0].price_btc,
-								price_eur: parsedBody[0].price_eur,
-								price_usd: parsedBody[0].price_usd,
+								price_eur: Number(parsedBody[0].price_eur).toFixed(2),
+								price_usd: Number(parsedBody[0].price_usd).toFixed(2),
 								symbol: parsedBody[0].symbol,
 							};
 							logger.info('updateFx result=', result);
 							return resolve(result);
 						} catch (e) {
+							logger.error('updateFx err=', e);
 							return reject(e);
 						}
 					});
