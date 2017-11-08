@@ -1,5 +1,9 @@
+'use strict';
+
 const logs = require('../logs.js')();
-module.exports = function(web3) {
+// const web3 = require('../globalweb3').web3;
+
+module.exports = function() {
 	return ({
 		getHashtags: function(address) {
 			const hashtags = [{

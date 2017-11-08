@@ -3,12 +3,12 @@ module.exports = function(web3) {
   return ({
     /**
 		* Get Heath
-		* @param {String} base64 
-		* @return {Array} 
+		* @param {String} base64
+		* @return {Array}
 		*/
     _setAvatar: function(base64) {
       return new Promise((resolve, reject) => {
-        // TODO: Send the image to the /Store container 
+        // TODO: Send the image to the /Store container
         // ipfs.add(base64, function(err, res) {
         //   resolve(res);
         // });
@@ -16,12 +16,12 @@ module.exports = function(web3) {
     },
 		/**
 		* Get Heath
-		* @param {String} hash 
-		* @return {Array} 
+		* @param {String} hash
+		* @return {Array}
 		*/
     _getAvatar: function(hash) {
       return new Promise((resolve, reject) => {
-        // TODO: Send the image to the /Store container 
+        // TODO: Send the image to the /Store container
         // ipfs.cat(hash, function(err, res) {
         //   let buf = '';
         //   if (err) {

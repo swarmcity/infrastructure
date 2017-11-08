@@ -2,7 +2,7 @@
 
 const logger = require('../logs')();
 
-module.exports = function(web3) {
+module.exports = function() {
 	const request = require('request');
 	let result;
 	return ({

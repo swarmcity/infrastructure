@@ -1,32 +1,27 @@
-'use strict';
-require('dotenv').config({
-	path: '../.env',
-});
+require('./environment');
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.WebsocketProvider(process.env.ETHWS));
 const logs = require('./logs.js')();
 
-const workerQueue = require('./scheduler/workerqueue')();
+const scheduledTask = require('./scheduler/scheduledtask')();
 
 // scheduled task handlers
-const getFx = require('./tasks/getFx')(web3);
-const getGasPrice = require('./tasks/getGasPrice')(web3);
-const getHashtags = require('./tasks/getHashtags')(web3);
+const getFx = require('./tasks/getFx')();
+const getGasPrice = require('./tasks/getGasPrice')();
+const getHashtags = require('./tasks/getHashtags')();
 
 // socket task handlers
-const getBalance = require('./tasks/getBalance')(web3);
+const getBalance = require('./tasks/getBalance')();
 
-//subscription handler
+// subscription handler
 const subscriptions = require('./subscriptions')();
 
 let connectedSockets = {};
 
 (() => {
 	// schedule getFx task every minute
-	workerQueue.scheduledTask.addTask({
+	scheduledTask.addTask({
 		func: getFx.updateFx,
 		interval: 60 * 1000,
 	});
@@ -49,7 +44,7 @@ io.on('connection', (socket) => {
 	connectedSockets[socket.id] = client;
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getBalance.getBalance(task.data);
 			},
@@ -65,7 +60,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getFx.getFx();
 			},
@@ -81,7 +76,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getGasPrice.getGasPrice();
 			},
@@ -97,7 +92,7 @@ io.on('connection', (socket) => {
 	);
 
 	client.scheduledTasks.push(
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			func: (task) => {
 				return getHashtags.getHashtags();
 			},
@@ -114,26 +109,65 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		logs.info('socket', socket.id, 'disconnected');
-		//workerQueue.scheduledTask.removeTasks(connectedSockets[socket.id].scheduledTasks);
-		//delete connectedSockets[socket.id];
 		subscriptions.unsubscribeAll(socket.id);
 	});
 
 	// handle subscribe
-	socket.on('subscribe', (data,callback) => {
-		subscriptions.subscribe(socket,data,callback);
+	socket.on('subscribe', (data, callback) => {
+		subscriptions.subscribe(socket, data, callback);
 	});
 
 	// handle unsubscribe
-	socket.on('unsubscribe', (data,callback) => {
-		subscriptions.unsubscribe(socket,data,callback);
+	socket.on('unsubscribe', (data, callback) => {
+		subscriptions.unsubscribe(socket, data, callback);
 	});
-
 });
 
-const PORT = process.env.APISOCKETPORT;
-const HOST = '0.0.0.0';
+const APISOCKETPORT = process.env.APISOCKETPORT;
+const APIHOST = process.env.APIHOST || '0.0.0.0';
+/**
+ * start the socket server and start listening
+ *
+ * @return     {Promise}  { resolves with { port , host} when listening }
+ */
+function listen() {
+	return new Promise((resolve, reject) => {
+		if (!APISOCKETPORT || !APIHOST) {
+			reject('no APISOCKETPORT defined in environment');
+		} else {
+			server.listen(APISOCKETPORT, APIHOST, (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					logs.info('server listening on host ', APIHOST, 'port', APISOCKETPORT);
+					resolve({
+						port: APISOCKETPORT,
+						host: APIHOST,
+					});
+				}
+			});
+		}
+	});
+}
 
-logs.info('server listening on host ', HOST, 'port', PORT);
+/**
+ * stop listening for new connections
+ *
+ * @return     {Promise}  { description_of_the_return_value }
+ */
+function close() {
+	return new Promise((resolve, reject) => {
+		server.close((err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
 
-server.listen(PORT, HOST);
+module.exports = {
+	listen: listen,
+	close: close,
+};

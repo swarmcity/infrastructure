@@ -5,38 +5,52 @@ require('dotenv').config({
 
 const logger = require('../logs')();
 
-const workerQueue = require('../scheduler/workerQueue')();
+const scheduledTask = require('../scheduler/scheduledTask')();
 
 describe('Swarm City scheduler', function() {
 	it('should receive all related events right after socket connects', function(done) {
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 1000,
 			func: hello,
 			interval: 1000,
 			data: 'a',
 		});
 
-		logger.info('there are ', workerQueue.scheduledTask.tasks.length,
+		logger.info('there are ', scheduledTask.tasks.length,
 			'tasks in the scheduledTask queue');
-		logger.info('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
+		logger.info('scheduler will wake up at ', scheduledTask.nextRun);
 
-		logger.info('there are ', workerQueue.scheduledTask.tasks.length,
-			'tasks in the scheduledTask queue');
-		logger.info('scheduler will wake up at ', workerQueue.scheduledTask.nextRun);
 
-		workerQueue.scheduledTask.addTask({
+		scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 2000,
 			func: hello,
 			responsehandler: responseHandler,
 			data: 'b',
 		});
 
-		workerQueue.scheduledTask.addTask({
+		logger.info('there are ', scheduledTask.tasks.length,
+			'tasks in the scheduledTask queue');
+		logger.info('scheduler will wake up at ', scheduledTask.nextRun);
+
+
+		scheduledTask.addTask({
 			nextRun: (new Date).getTime() + 3000,
 			func: hello,
 			responsehandler: responseHandler,
 			data: 'c',
 		});
+
+		done();
+	});
+	it('should wait a few moments', function(done) {
+		setTimeout(() => {
+			done();
+		}, 4 * 1000);
+	});
+
+	it('should cancel all tasks', function(done) {
+		scheduledTask.removeTasks(scheduledTask.tasks);
+		done();
 	});
 });
 

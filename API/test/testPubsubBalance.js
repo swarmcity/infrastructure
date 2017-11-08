@@ -1,23 +1,32 @@
 'use strict';
-require('dotenv').config({
-	path: '../../.env',
-});
 const should = require('should');
 const logger = require('../logs')();
 
 const io = require('socket.io-client');
-// const socketWildcard = require('socketio-wildcard')();
-// var patch = require('socketio-wildcard')(io.Manager);
 
-const socketURL = 'http://localhost:8011?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
 const options = {
 	'transports': ['websocket'],
 	'force new connection': true,
 };
 
+// create a server
+const server = require('../socket');
+
 describe('Swarm City API socket client > test pubsub on \'balance\'', function() {
 	let client;
 	let subscriptions = [];
+
+	let socketURL;
+
+
+	before(function(done) {
+		server.listen().then((con) => {
+			socketURL = 'http://localhost:' +
+				con.port + '?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
+			logger.info('socketURL=', socketURL);
+			done();
+		});
+	});
 
 	it('should subscribe / receive a subscription ID', function(done) {
 		logger.info('connecting to ', socketURL);
@@ -30,7 +39,7 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 					channel: 'balance',
 					args: {
 						address: '0x7018d8f698bfa076e1bdc916e2c64caddc750944',
-					}
+					},
 				}, (data) => {
 					should(data).have.property('response', 200);
 					should(data).have.property('subscriptionId');
@@ -51,11 +60,22 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 		});
 	});
 
+	it('should wait a while for a block', (done) => {
+		// listen to updates....
+		client.on('balanceChanged', (data) => {
+			logger.info('balanceChanged');
+			logger.info('received balance update...', data);
+		});
 
-	it('should unsubscribe / receive a confirmation', function(done) {
+		setTimeout(() => {
+			done();
+		}, 50 * 1000);
+	});
+
+	it('should unsubscribe / receive a confirmation', (done) => {
 		let promises = [];
 		subscriptions.forEach((subscription) => {
-			logger.info('unsubscribe from',subscription);
+			logger.info('unsubscribe from', subscription);
 			promises.push(new Promise((resolve, reject) => {
 				client.emit('unsubscribe', {
 					subscriptionId: subscription,
@@ -75,9 +95,14 @@ describe('Swarm City API socket client > test pubsub on \'balance\'', function()
 		});
 	});
 
-
 	after(function(done) {
-		client.close();
-		done();
+		logger.info('closing client socket');
+		client.close(() => {
+			logger.info('client closed...');
+		});
+		server.close().then(() => {
+			logger.info('server closed...');
+			done();
+		});
 	});
 });
