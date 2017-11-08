@@ -2,11 +2,11 @@
 module.exports = function(web3) {
   return ({
     /**
-     * Get Heath
-     *
-     * @param      {String}  base64  The base 64
-     * @return     {Array}   { description_of_the_return_value }
-     */
+
+		* Get Heath
+		* @param {String} base64
+		* @return {Array}
+		*/
     _setAvatar: function(base64) {
       return new Promise((resolve, reject) => {
         // TODO: Send the image to the /Store container
@@ -24,6 +24,11 @@ module.exports = function(web3) {
     _getAvatar: function(hash) {
       return new Promise((resolve, reject) => {
        // TODO
+		/**
+		* Get Heath
+		* @param {String} hash
+		* @return {Array}
+		*/
       });
     },
   });

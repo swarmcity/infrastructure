@@ -17,8 +17,9 @@ describe('Swarm City API socket client', function() {
 
 	before(function(done) {
 		server.listen().then((con) => {
-			socketURL = 'http://localhost:' + con.port +
-				'?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
+
+			socketURL = 'http://localhost:' +
+				con.port + '?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
 			logger.info('socketURL=', socketURL);
 			done();
 		});
