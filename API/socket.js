@@ -131,18 +131,20 @@ const APIHOST = process.env.APIHOST || '0.0.0.0';
 function listen() {
 	return new Promise((resolve, reject) => {
 		if (!APISOCKETPORT || !APIHOST) {
-			return reject('no APISOCKETPORT defined in environment');
-		}
-		server.listen(APISOCKETPORT, APIHOST, (err) => {
-			if (err) {
-				return reject(err);
-			}
-			logs.info('server listening on host ', APIHOST, 'port', APISOCKETPORT);
-			return resolve({
-				port: APISOCKETPORT,
-				host: APIHOST,
+			reject('no APISOCKETPORT defined in environment');
+		} else {
+			server.listen(APISOCKETPORT, APIHOST, (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					logs.info('server listening on host ', APIHOST, 'port', APISOCKETPORT);
+					resolve({
+						port: APISOCKETPORT,
+						host: APIHOST,
+					});
+				}
 			});
-		});
+		}
 	});
 }
 
@@ -155,9 +157,10 @@ function close() {
 	return new Promise((resolve, reject) => {
 		server.close((err) => {
 			if (err) {
-				return reject(err);
+				reject(err);
+			} else {
+				resolve();
 			}
-			return resolve();
 		});
 	});
 }
