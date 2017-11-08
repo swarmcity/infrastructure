@@ -159,9 +159,10 @@ function close() {
 	return new Promise((resolve, reject) => {
 		server.close((err) => {
 			if (err) {
-				return reject(err);
+				reject(err);
+			} else {
+				resolve();
 			}
-			return resolve();
 		});
 	});
 }
@@ -169,4 +170,4 @@ function close() {
 module.exports = {
 	listen: listen,
 	close: close,
-}
+};

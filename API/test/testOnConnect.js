@@ -8,9 +8,8 @@ const options = {
 	'force new connection': true,
 };
 
-// create a server 
+// create a server
 const server = require('../socket');
-
 
 
 describe('Swarm City API socket client', function() {
@@ -20,10 +19,11 @@ describe('Swarm City API socket client', function() {
 
 	before(function(done) {
 		server.listen().then((con) => {
-			socketURL = 'http://localhost:' + con.port + '?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
+			socketURL = 'http://localhost:' +
+				con.port + '?publicKey=0x7018d8f698bfa076e1bdc916e2c64caddc750944';
 			logger.info('socketURL=', socketURL);
 			done();
-		})
+		});
 	});
 
 	it('should receive all related events right after socket connects', function(done) {

@@ -66,7 +66,7 @@ function status() {
  *
  * @param      {Object}    socket    The socket requesting the subscribe
  * @param      {Object}    data      The data the socket sent along
- * @param      {Function}  callback  Callback for sending the reply to socket 
+ * @param      {Function}  callback  Callback for sending the reply to socket
  * @return     {Object} null
  */
 function subscribe(socket, data, callback) {

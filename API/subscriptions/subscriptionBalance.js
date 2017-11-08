@@ -37,7 +37,6 @@ function createSubscription(socket, args) {
 			}));
 		},
 		responsehandler: (res, task) => {
-			JSON.stringify
 			logs.debug('received getBalance RES=', JSON.stringify(res, null, 4));
 			task.data.socket.emit('balanceChanged', res);
 			return blockHeaderTask.addTask(task);
