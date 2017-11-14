@@ -25,25 +25,30 @@
 
                         // Call the api for checkApproval
                         // Here we need to check if the pubkey already has given an allowance
-                        var _hashtagAddress = "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6";
+                        var _hashtagAddress = "0x756D15cd1f5181a1BD8a61202A40988D639abF02";
+                        var _tokenAddress = "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607";
                         var _publicKey = window.kf[3].publicKey;
                         const _privatekey = privateKey;
                         var dealIdInternal = 'abc';
                         var data = {
                           //dealIdInternal: dragon.uuid.v4();
-                          dealIdInternal: dealIdInternal,
+                          //dealIdInternal: dealIdInternal,
                           dealIdExternal: dragon.addHexPrefix(dragon.sha3(dealIdInternal).toString('hex')),
                           hashtagAddress: _hashtagAddress,
                           publicKey: _publicKey,
-                          privateKey: privateKey,
+                          //privateKey: privateKey,
                           allowanceNeeded: (hashtagfee / 2) + swtvalue,
                           dealValue: swtvalue
                         };
 
+                        // IPFS HASH the data thing
+                        data.ipfshash = "ipfshash";
 
                         // Setting up some ingredients
-                        var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
+                        var swtContract = new dragon.Contract(abis.miniMeToken.abi, _tokenAddress);
+                        var simpleDealContract = new dragon.Contract(abis.hashtag.abi, _hashtagAddress);
+                        var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo(data.dealIdExternal, data.dealValue, data.ipfshash).encodeABI();
+                        data.extraData = encodedSimpleDealTx;
 
                         // [kf] @will this is shit code but i just want to make dealmaking work in a first frontend iteration
 
@@ -60,14 +65,17 @@
                             case 0:
                               // create approval, chain the dealmaking
                               var approve = {
-                                spender: "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6",
-                                from: window.kf[3].publicKey,
+                                spender: _hashtagAddress,
+                                from: data.publicKey,
                                 allowance: data.allowanceNeeded
                               }
-                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
-                                self.approve("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, gasNeeded, gasPrice, from, privateKey).then((txhash) => {
-                                  self.makeDeal(data).then((txhash) => resolve(txhash));
-                                });
+
+
+                              self.estimateGas(data).then((gasNeeded) => {
+                                debugger;
+                              //   self.approveAndCall(data).then((txhash) => {
+                              //    resolve(txhash);
+                              //  });
                               });
                               break;
                             case 1:
@@ -76,13 +84,13 @@
                               // we need to set it to zero first
                               // https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
 
-                              self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, window.kf[3].publicKey).then((gasNeeded) => {
+                              self.estimateGas(_hashtagAddress, 0, window.kf[3].publicKey).then((gasNeeded) => {
                                 self.getGasPrice().then((result)=>{
-                                  self.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", 0, gasNeeded, result, window.kf[3].publicKey, privateKey).then(()=>{
-                                    self.estimateGas("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
+                                  self.approveTx(_hashtagAddress, 0, gasNeeded, result, window.kf[3].publicKey, privateKey).then(()=>{
+                                    self.estimateGas(_hashtagAddress, data.allowanceNeeded, window.kf[3].publicKey).then((gasNeeded) => {
                                       data.gasPrice = parseInt(result);
                                       data.gasNeeded = gasNeeded;
-                                      self.approveTx("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.allowanceNeeded, data.gasNeeded, data.gasPrice, window.kf[3].publicKey, data.privateKey).then(()=>{
+                                      self.approveTx(_hashtagAddress, data.allowanceNeeded, data.gasNeeded, data.gasPrice, window.kf[3].publicKey, data.privateKey).then(()=>{
                                         self.makeDeal(data).then((txhash)=>{
                                           resolve(txhash);
                                         });
@@ -136,15 +144,11 @@
             * @param {number} allowance - The amount of swt tokens to be allowed / in smallest 1e18
             * @param {string} from - The public key
             */
-            estimateGas(_spender, _allowance, _from) {
+            estimateGas(data) {
               return new Promise((resolve, reject)=>{
-                //var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                //var swtContract = new dragon.Contract(abis.miniMeToken.abi, _tokenAddress);
                 //swtContract.methods.approve(_spender, _allowance).estimateGas({from: _from})
-                var data = {
-                  spender: _spender,
-                  from: _from,
-                  allowance: _allowance
-                };
+                
                 socket.emit('estimateGas', data, function(_gasNeeded){
                   var gasNeeded = _gasNeeded.gasNeeded;
                   console.log("estimategas from API: ", gasNeeded);
@@ -156,23 +160,23 @@
             /**
             * makeDeal creates the actual deal
             * @return {string} txHash - The tx hash
-            * @param {object} deal - The dealobject
+            * @param {object} data - The dealobject
             */
-            makeDeal(_deal) {
+            approveAndCall(data) {
               return new Promise((resolve, reject) => {
-                var simpleDealContract = new dragon.Contract(abis.hashtag.abi, "0x9a166b528a59A993Fd9dce2035f912F9EB2783c6");
-                var encodedSimpleDealTx = simpleDealContract.methods.makeDealForTwo(_deal.dealIdExternal, _deal.dealValue, "ipfshash").encodeABI();
+                var swtContract = new dragon.Contract(abis.miniMeToken.abi, _tokenAddress);
+                var encodedApproveAndCallTx = swtContract.methods.approveAndCall("0x9a166b528a59A993Fd9dce2035f912F9EB2783c6", data.dealValue, data.extraData).encodeABI();
 
                 const rawTx = {
                   nonce: window.kf[3].nonce++,
-                  to: _deal.hashtagAddress,
-                  data: encodedSimpleDealTx,
-                  gasPrice: _deal.gasPrice,
+                  to: 0xb9e7f8568e08d5659f5d29c4997173d84cdf2607,
+                  data: encodedApproveAndCallTx,
+                  gasPrice: data.gasPrice,
                   gasLimit: 300009
                 };
 
                 var tx = new dragon.Transaction(rawTx);
-                tx.sign(_deal.privateKey);
+                tx.sign(self.privateKey);
 
                 var serializedtx = dragon.addHexPrefix(tx.serialize().toString('hex'));
                 // emit it to the api > processTx
@@ -189,16 +193,16 @@
             * @param {number} gasNeeded - The public key
             * @param {number} gasPrice - The public key
             */
-            approveTx(_spender, _allowance, _gasNeeded, _gasPrice, _from, _privatekey) {
+            approveAndCall(_spender, _allowance, _gasNeeded, _gasPrice, _from, _privatekey) {
               return new Promise((resolve, reject) => {
-                var swtContract = new dragon.Contract(abis.miniMeToken.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
+                var swtContract = new dragon.Contract(abis.miniMeToken.abi, _tokenAddress);
 
                 var encodedtx = swtContract.methods.approve(_spender, _allowance).encodeABI();
                 var gasPrice = parseInt(_gasPrice);
 
                 const rawTx = {
                   nonce: window.kf[3].nonce++,
-                  to: "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607",
+                  to: _tokenAddress,
                   data: encodedtx,
                   gasPrice: gasPrice,
                   gasLimit: _gasNeeded,
