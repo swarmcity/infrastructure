@@ -1,5 +1,4 @@
 const logs = require('../logs.js')();
-const minimeContract = require('../contracts/MiniMeToken.json');
 
 module.exports = function(web3) {
 	return ({
@@ -8,9 +7,7 @@ module.exports = function(web3) {
 
 				console.log(data);
 
-				var contractInstance = new web3.eth.Contract(minimeContract.abi, "0xb9e7f8568e08d5659f5d29c4997173d84cdf2607");
-
-				contractInstance.methods.approveAndCall(data.hashtagAddress, data.dealValue, data.extraData).estimateGas({from: data.publicKey})
+				web3.eth.estimateGas({to: data.to, data: data.data})
 				.then(function(gasAmount){
 						resolve(gasAmount);
 				 }).catch(function(error){

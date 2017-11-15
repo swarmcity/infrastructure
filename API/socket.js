@@ -4,7 +4,9 @@ const app = require('express')();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
+//const web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8546'));
+const web3 = new Web3(new Web3.providers.WebsocketProvider('http://138.197.179.88:8546'));
+
 const logs = require('./logs.js')();
 const tasks = require('./tasks.js')(web3);
 const newItem = require('./tasks/newItem.js')(web3);
