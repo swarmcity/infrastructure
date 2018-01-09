@@ -1,0 +1,143 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="functions/function-wallet.html">
+<link rel="import" href="functions/function-message.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="encrypt-message">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .inputfile {
+                width: 0.1px;
+                height: 0.1px;
+                opacity: 0;
+                overflow: hidden;
+                position: absolute;
+                z-index: -1;
+            }
+        </style>
+        <function-wallet id="wallet"></function-wallet>
+        <function-message id="message"></function-message>
+        <div class="container">
+            <h1>Encrypt Message</h1>
+            <p>Enter the message to encrypt below and then select they kestore to encrypt it with.</p>
+            <paper-input char-counter label="Message" value="{{message}}"></paper-input>
+            <input type="file" name="file" id="file" class="inputfile" on-change="_getFile"/>
+            </br>
+            <label for="file">
+                <paper-button toggles raised>Select Keystore</paper-button>
+            </label>
+
+
+        <template is="dom-if" if="{{encryptedMessage}}">
+            <paper-textarea label="Encrypted Message" value="{{signature}}"></paper-textarea>
+            <p>This is your encrypted message you can send or broadcast publicly but only the person with the public key you signedit with can read it</p>    
+        </template>
+
+        </div>
+    </template>
+    <script>
+        class SignMessage extends Polymer.Element {
+            static get is() {
+                return 'encrypt-message';
+            }
+            static get properties() {
+                return {
+                    /**
+                    * wallet represnts the users wallet
+                    * @type {Object}
+                    */
+                    wallet: {
+                        type: Object,
+                    },
+                    /**
+                    * is the unlock button disabled
+                    * @type {Boolean}
+                    */
+                    disabled: {
+                        type: Boolean,
+                        value: true,
+                    },
+                    /**
+                    * show the password
+                    * @type {Boolean}
+                    */
+                    askPassword: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    /**
+                    * show the signed message
+                    * @type {Boolean}
+                    */
+                    signedMessage: {
+                        type: Boolean,
+                        value: false,
+                    },
+                };
+            }
+
+            /**
+            * Fired when the user selects a file
+            * @param {event} event The event from the on-change
+            */
+            _getFile(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                const file = event.target.files[0];
+                let reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = () => {
+                    this.keystore = JSON.parse(reader.result);
+                    this.askPassword = true;
+                };
+                reader.onerror = (error) => {
+                    this.loading = false;
+                    this.error = error;
+                };
+        }
+        _checkPassword() {
+            if (this.password.length >= 10) {
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        }
+        _signMessage(keystore) {
+            this.$.wallet.decryptUtcKeystore(this.keystore, this.password)
+            .then((data) => {
+                const privateKey = data;
+                const message = this.message;
+                const address = this.keystore.address;
+                const date = this._makeDate();
+                return this.$.message.signMessage(privateKey, message, address, date);
+            })
+            .then((data) => {
+                const signature = data;
+                this.signature = signature;
+                this.signedMessage = true;
+            });
+        }
+        _makeDate() {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+            if (dd<10) {
+                dd = '0'+dd;
+            }
+            if (mm<10) {
+                mm = '0'+mm;
+            }
+            today = mm + '/' + dd + '/' + yyyy;
+            return today;
+        }
+        } window.customElements.define(SignMessage.is, SignMessage);
+    </script>
+</dom-module>
+
