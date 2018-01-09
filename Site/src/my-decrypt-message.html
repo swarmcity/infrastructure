@@ -1,0 +1,25 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="components/decrypt-message.html">
+
+<dom-module id="my-decrypt-message">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            padding: 10px;
+        }
+        </style>
+
+    <div class="card">
+        <decrypt-message></decrypt-message>
+    </div>
+  </template>
+
+  <script>
+    class MyDecryptMessage extends Polymer.Element {
+      static get is() {return 'my-decrypt-message';
+    }
+    } window.customElements.define(MyDecryptMessage.is, MyDecryptMessage);
+  </script>
+</dom-module>
