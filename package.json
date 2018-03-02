@@ -19,6 +19,8 @@
   "author": "Dragon System",
   "license": "MIT",
   "dependencies": {
+    "bitcore-ecies": "^1.0.3",
+    "bitcore-lib": "^0.15.0",
     "chalk": "^2.1.0",
     "commander": "^2.11.0",
     "figlet": "^1.2.0",
@@ -37,6 +39,7 @@
   },
   "homepage": "https://github.com/DragonSystems/DragonSystem#readme",
   "devDependencies": {
-    "eslint-config-google": "^0.9.1"
+    "eslint-config-google": "^0.9.1",
+    "webpack": "^3.10.0"
   }
 }

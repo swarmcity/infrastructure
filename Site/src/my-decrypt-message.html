@@ -10,16 +10,15 @@
             padding: 10px;
         }
         </style>
+        <div class="card">
+            <decrypt-message></decrypt-message>
+        </div>
+    </template>
 
-    <div class="card">
-        <decrypt-message></decrypt-message>
-    </div>
-  </template>
-
-  <script>
-    class MyDecryptMessage extends Polymer.Element {
-      static get is() {return 'my-decrypt-message';
-    }
-    } window.customElements.define(MyDecryptMessage.is, MyDecryptMessage);
-  </script>
+    <script>
+        class MyDecryptMessage extends Polymer.Element {
+            static get is() {return 'my-decrypt-message';
+        }
+        } window.customElements.define(MyDecryptMessage.is, MyDecryptMessage);
+    </script>
 </dom-module>

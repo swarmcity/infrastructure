@@ -20,6 +20,8 @@ import scrypt from 'scryptsy';
 import uuid from 'uuid';
 import Buffer from 'buffer';
 import QRCode from 'qrcode';
+import ECIES from './bitcore-ecies/ecies';
+import bitcore from 'bitcore-lib';
 
 export {
   sha3,
@@ -41,4 +43,6 @@ export {
   uuid,
   Buffer,
   QRCode,
+  ECIES,
+  bitcore
 };

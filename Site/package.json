@@ -36,7 +36,7 @@
     "test": "polymer test",
     "start": "node server.js",
     "test:integration": "polymer build",
-    "webpack": "webpack",
+    "webpack": "webpack --progress",
     "build": "polymer build",
     "serve": "polymer serve"
   },
