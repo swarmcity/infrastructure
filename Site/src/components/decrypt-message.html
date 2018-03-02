@@ -42,7 +42,7 @@
         </div>
     </template>
     <script>
-        class SignMessage extends Polymer.Element {
+        class DecryptMessage extends Polymer.Element {
             static get is() {
                 return 'decrypt-message';
             }
@@ -137,6 +137,6 @@
             today = mm + '/' + dd + '/' + yyyy;
             return today;
         }
-        } window.customElements.define(SignMessage.is, SignMessage);
+        } window.customElements.define(DecryptMessage.is, DecryptMessage);
     </script>
 </dom-module>
